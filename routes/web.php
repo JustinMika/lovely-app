@@ -35,6 +35,8 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('articles/categories', function () {
 			return view('pages.articles.categories');
 		})->name('articles.categories');
+		Route::get('articles/export/pdf', [App\Http\Controllers\ArticleExportController::class, 'exportPdf'])->name('articles.export.pdf');
+		Route::get('articles/export/excel', [App\Http\Controllers\ArticleExportController::class, 'exportExcel'])->name('articles.export.excel');
 	});
 
 	// Stock & Approvisionnement - Admin/Gérant/Caissier
@@ -48,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
 	// Gestion des lots - Admin/Gérant only
 	Route::middleware(['role:Admin,Gérant'])->group(function () {
 		Route::resource('lots', App\Http\Controllers\LotController::class);
+		Route::get('lots/export/pdf', [App\Http\Controllers\LotExportController::class, 'exportPdf'])->name('lots.export.pdf');
 	});
 
 	// Ventes - All authenticated users
@@ -84,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
 	Route::get('clients/history', function () {
 		return view('pages.clients.history');
 	})->name('clients.history');
+	Route::get('clients/export/pdf', [App\Http\Controllers\ClientExportController::class, 'exportPdf'])->name('clients.export.pdf');
 
 	// Example SweetAlert2 + Livewire Demo
 	Route::get('/examples/sweetalert', [App\Http\Controllers\ExampleLivewireController::class, 'showAlert'])->name('examples.sweetalert');
@@ -102,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/exports', function () {
 			return view('pages.reports.exports');
 		})->name('exports');
+		Route::get('/global/pdf', [App\Http\Controllers\GlobalReportController::class, 'exportPdf'])->name('global.pdf');
 	});
 
 	// Utilisateurs & Sécurité - Admin only
@@ -112,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/create', function () {
 			return view('pages.users.create');
 		})->name('create');
+		Route::get('/export/pdf', [App\Http\Controllers\UserExportController::class, 'exportPdf'])->name('export.pdf');
 	});
 
 	// Rôles & Permissions - Admin only
@@ -135,5 +141,9 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/cities', function () {
 			return view('pages.settings.cities');
 		})->name('cities');
+		Route::get('/cities/export/pdf', [App\Http\Controllers\VilleExportController::class, 'exportPdf'])->name('cities.export.pdf');
 	});
+
+	// Routes d'export pour les ventes
+	Route::get('ventes/export/pdf', [App\Http\Controllers\VenteExportController::class, 'exportPdf'])->name('ventes.export.pdf');
 });
