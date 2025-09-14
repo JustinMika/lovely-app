@@ -10,8 +10,8 @@
                 <img class="hidden dark:block" src="{{ asset('images/logo/logo-dark.svg') }}" alt="Lovely Boutique" />
             </span>
 
-            <img class="logo-icon" :class="sidebarToggle ? 'xl:block' : 'hidden'" src="{{ asset('images/logo/logo-icon.svg') }}"
-                alt="Logo" />
+            <img class="logo-icon" :class="sidebarToggle ? 'xl:block' : 'hidden'"
+                src="{{ asset('images/logo/logo-icon.svg') }}" alt="Logo" />
         </a>
     </div>
     <!-- SIDEBAR HEADER -->
@@ -37,15 +37,16 @@
                 <ul class="mb-6 flex flex-col gap-1">
                     <!-- Menu Item Dashboard -->
                     <li>
-                        <a href="{{ route('dashboard') }}" @click="selected = (selected === 'Dashboard' ? '':'Dashboard')"
-                            class="menu-item group"
+                        <a href="{{ route('dashboard') }}"
+                            @click="selected = (selected === 'Dashboard' ? '':'Dashboard')" class="menu-item group"
                             :class="(selected === 'Dashboard') && (page === 'dashboard') ? 'menu-item-active' :
                             'menu-item-inactive'">
                             <svg :class="(selected === 'Dashboard') && (page === 'dashboard') ? 'menu-item-icon-active' :
                             'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
+                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
+                                    fill="currentColor" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -66,7 +67,9 @@
                             'menu-item-icon-active' : 'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H4V8h16v8zM6 10h2v2H6zm0 3h8v1H6zm10-3h2v2h-2z" fill="currentColor" />
+                                <path
+                                    d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H4V8h16v8zM6 10h2v2H6zm0 3h8v1H6zm10-3h2v2h-2z"
+                                    fill="currentColor" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -91,7 +94,8 @@
                                 class="menu-dropdown mt-2 flex flex-col gap-1 pl-9">
                                 <li>
                                     <a href="{{ route('articles.index') }}" class="menu-dropdown-item group"
-                                        :class="page === 'articles' ? 'menu-dropdown-item-active' :
+                                        :class="page === 'articles' || page === 'addArticle' || page === 'categories' ||
+                                            page === 'addCategory' ? 'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
                                         Liste des articles
                                     </a>
@@ -101,20 +105,6 @@
                                         :class="page === 'addArticle' ? 'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
                                         Ajouter un article
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('categories.index') }}" class="menu-dropdown-item group"
-                                        :class="page === 'categories' ? 'menu-dropdown-item-active' :
-                                            'menu-dropdown-item-inactive'">
-                                        Liste des catégories
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('categories.create') }}" class="menu-dropdown-item group"
-                                        :class="page === 'addCategory' ? 'menu-dropdown-item-active' :
-                                            'menu-dropdown-item-inactive'">
-                                        Ajouter une catégorie
                                     </a>
                                 </li>
                             </ul>
@@ -134,7 +124,8 @@
                             'menu-item-icon-active' : 'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -195,14 +186,20 @@
                     <li>
                         <a href="#" @click.prevent="selected = (selected === 'Ventes' ? '':'Ventes')"
                             class="menu-item group"
-                            :class="(selected === 'Ventes') || (page === 'newSale' || page === 'invoices' || page === 'searchInvoice' || page === 'payments') ? 'menu-item-active' :
+                            :class="(selected === 'Ventes') || (page === 'newSale' || page === 'invoices' ||
+                                page === 'searchInvoice' || page === 'payments') ? 'menu-item-active' :
                             'menu-item-inactive'">
-                            <svg :class="(selected === 'Ventes') || (page === 'newSale' || page === 'invoices') ? 'menu-item-icon-active' :
+                            <svg :class="(selected === 'Ventes') || (page === 'newSale' || page === 'invoices') ?
+                            'menu-item-icon-active' :
                             'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2.31641 4H3.49696C4.24468 4 4.87822 4.55068 4.98234 5.29112L5.13429 6.37161M5.13429 6.37161L6.23641 14.2089C6.34053 14.9493 6.97407 15.5 7.72179 15.5L17.0833 15.5C17.6803 15.5 18.2205 15.146 18.4587 14.5986L21.126 8.47023C21.5572 7.4795 20.8312 6.37161 19.7507 6.37161H5.13429Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M7.7832 19.5H7.7932M16.3203 19.5H16.3303" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M2.31641 4H3.49696C4.24468 4 4.87822 4.55068 4.98234 5.29112L5.13429 6.37161M5.13429 6.37161L6.23641 14.2089C6.34053 14.9493 6.97407 15.5 7.72179 15.5L17.0833 15.5C17.6803 15.5 18.2205 15.146 18.4587 14.5986L21.126 8.47023C21.5572 7.4795 20.8312 6.37161 19.7507 6.37161H5.13429Z"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M7.7832 19.5H7.7932M16.3203 19.5H16.3303" stroke="currentColor"
+                                    stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -263,15 +260,20 @@
                     <li>
                         <a href="#" @click.prevent="selected = (selected === 'Clients' ? '':'Clients')"
                             class="menu-item group"
-                            :class="(selected === 'Clients') || (page === 'clients' || page === 'addClient' || page === 'clientHistory') ? 'menu-item-active' :
+                            :class="(selected === 'Clients') || (page === 'clients' || page === 'addClient' ||
+                                page === 'clientHistory') ? 'menu-item-active' :
                             'menu-item-inactive'">
-                            <svg :class="(selected === 'Clients') || (page === 'clients' || page === 'addClient') ? 'menu-item-icon-active' :
+                            <svg :class="(selected === 'Clients') || (page === 'clients' || page === 'addClient') ?
+                            'menu-item-icon-active' :
                             'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="m22 21-3-3m0 0a2 2 0 1 1-2.83-2.83A2 2 0 0 1 19 18Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="m22 21-3-3m0 0a2 2 0 1 1-2.83-2.83A2 2 0 0 1 19 18Z" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -325,14 +327,17 @@
                     <li>
                         <a href="#" @click.prevent="selected = (selected === 'Rapports' ? '':'Rapports')"
                             class="menu-item group"
-                            :class="(selected === 'Rapports') || (page === 'salesReports' || page === 'financialReports' || page === 'stockReports' || page === 'exports') ?
+                            :class="(selected === 'Rapports') || (page === 'salesReports' || page === 'financialReports' ||
+                                page === 'stockReports' || page === 'exports') ?
                             'menu-item-active' : 'menu-item-inactive'">
                             <svg :class="(selected === 'Rapports') || (page === 'salesReports' || page === 'financialReports') ?
                             'menu-item-icon-active' : 'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="m19 9-5 5-4-4-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 3v18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="m19 9-5 5-4-4-3 3" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -391,7 +396,8 @@
 
                     <!-- Menu Item Utilisateurs -->
                     <li>
-                        <a href="#" @click.prevent="selected = (selected === 'Utilisateurs' ? '':'Utilisateurs')"
+                        <a href="#"
+                            @click.prevent="selected = (selected === 'Utilisateurs' ? '':'Utilisateurs')"
                             class="menu-item group"
                             :class="(selected === 'Utilisateurs') || (page === 'users' || page === 'addUser' ||
                                 page === 'roles' || page === 'permissions') ? 'menu-item-active' :
@@ -401,9 +407,12 @@
                             'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="m22 21-3-3m0 0a2 2 0 1 1-2.83-2.83A2 2 0 0 1 19 18Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="m22 21-3-3m0 0a2 2 0 1 1-2.83-2.83A2 2 0 0 1 19 18Z" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -457,15 +466,21 @@
                     <li>
                         <a href="#" @click.prevent="selected = (selected === 'Parametres' ? '':'Parametres')"
                             class="menu-item group"
-                            :class="(selected === 'Parametres') || (page === 'generalSettings' || page === 'billingSettings' ||
+                            :class="(selected === 'Parametres') || (page === 'generalSettings' ||
+                                page === 'billingSettings' ||
                                 page === 'citiesSettings' || page === 'taxSettings') ?
                             'menu-item-active' : 'menu-item-inactive'">
-                            <svg :class="(selected === 'Parametres') || (page === 'generalSettings' || page === 'billingSettings') ?
+                            <svg :class="(selected === 'Parametres') || (page === 'generalSettings' ||
+                                page === 'billingSettings') ?
                             'menu-item-icon-active' : 'menu-item-icon-inactive'"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path
+                                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
 
                             <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">
@@ -509,10 +524,12 @@
                                         Villes & Taxes
                                     </a>
                                 </li>
-                </ul>
-            </div>
-            <!-- Menu Group -->
+                            </ul>
+                        </div>
+                        <!-- Menu Group -->
         </nav>
         <!-- Sidebar Menu -->
+    </div>
+    </div>
     </div>
 </aside>
