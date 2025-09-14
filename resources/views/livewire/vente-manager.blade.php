@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Ventes</h2>
-            <p class="text-gray-600 dark:text-gray-400">Gérez les ventes et consultez l'historique</p>
+            <p class="text-gray-600 dark:text-gray-400">Gérez les ventes avec panier intégré et FIFO automatique</p>
         </div>
         <div class="flex flex-wrap gap-2">
             <button wire:click="exportPdf"
@@ -15,6 +15,15 @@
                 </svg>
                 Export PDF
             </button>
+            <button wire:click="openCartModal"
+                class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6">
+                    </path>
+                </svg>
+                Panier ({{ count($contenuPanier) }})
+            </button>
             <button wire:click="openModal"
                 class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,6 +33,61 @@
             </button>
         </div>
     </div>
+
+    <!-- Ajout rapide au panier -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Ajout Rapide au Panier</h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Article</label>
+                <select wire:model="selectedArticle"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <option value="">Sélectionner un article</option>
+                    @foreach ($articles as $article)
+                        <option value="{{ $article->id }}">
+                            {{ $article->designation }} (Stock: {{ $this->getStockDisponible($article->id) }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Quantité</label>
+                <input wire:model="quantite" type="number" min="1"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remise (%)</label>
+                <input wire:model="remise_ligne" type="number" min="0" max="100" step="0.1"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+            <div class="flex items-end">
+                <button wire:click="ajouterAuPanier"
+                    class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    Ajouter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé du panier -->
+    @if (count($contenuPanier) > 0)
+        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h4 class="text-lg font-medium text-green-800 dark:text-green-200">
+                        Panier: {{ count($contenuPanier) }} article(s)
+                    </h4>
+                    <p class="text-green-600 dark:text-green-300">
+                        Total: {{ number_format($total, 0, ',', ' ') }} FC
+                    </p>
+                </div>
+                <button wire:click="openModal"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    Finaliser la Vente
+                </button>
+            </div>
+        </div>
+    @endif
 
     <!-- Filtres et recherche -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
@@ -152,7 +216,8 @@
                                     <button wire:click="showDetail({{ $vente->id }})"
                                         class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
                                         title="Voir les détails">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

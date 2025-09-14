@@ -144,6 +144,20 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/cities/export/pdf', [App\Http\Controllers\VilleExportController::class, 'exportPdf'])->name('cities.export.pdf');
 	});
 
+	// Routes pour les ventes avec middleware de rôles
+	Route::middleware(['auth', 'role:Admin,Gérant,Caissier,Vendeur'])->group(function () {
+		Route::get('/ventes', function () {
+			return view('pages.ventes.index');
+		})->name('ventes.index');
+
+		// Routes pour les factures
+		Route::get('/factures/{vente}/generer', [App\Http\Controllers\FactureController::class, 'genererFacture'])->name('factures.generer');
+		Route::get('/factures/{vente}/imprimer', [App\Http\Controllers\FactureController::class, 'imprimerFacture'])->name('factures.imprimer');
+		Route::get('/factures/{vente}/telecharger', [App\Http\Controllers\FactureController::class, 'telechargerFacture'])->name('factures.telecharger');
+
+		Route::get('/ventes/export/pdf', [App\Http\Controllers\VenteExportController::class, 'exportPdf'])->name('ventes.export.pdf');
+	});
+
 	// Routes d'export pour les ventes
 	Route::get('ventes/export/pdf', [App\Http\Controllers\VenteExportController::class, 'exportPdf'])->name('ventes.export.pdf');
 });

@@ -7,16 +7,22 @@ use App\Models\Client;
 use App\Models\Article;
 use App\Models\Lot;
 use App\Models\LigneVente;
+use App\Services\CartService;
+use App\Services\StockFifoService;
 use Illuminate\Database\Eloquent\Builder;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB;
+use Darryldecode\Cart\Facades\CartFacade as Cart;
 
 class VenteManager extends Component
 {
     use WithPagination, LivewireAlert;
+
+    protected $cartService;
+    protected $stockFifoService;
 
     // Propriétés de recherche et tri
     public $search = '';
@@ -31,59 +37,46 @@ class VenteManager extends Component
     public $remise_totale = 0;
     public $montant_paye = 0;
 
-    // Propriétés pour les lignes de vente
-    public $lignes = [];
+    // Propriétés pour le panier
     public $selectedArticle = null;
-    public $selectedLot = null;
     public $quantite = 1;
-    public $prix_unitaire = 0;
     public $remise_ligne = 0;
+    public $contenuPanier = [];
 
     // États du composant
     public $showModal = false;
     public $editMode = false;
     public $showDetailModal = false;
     public $selectedVente = null;
+    public $showCartModal = false;
 
     protected $paginationTheme = 'tailwind';
+
+    public function boot(CartService $cartService, StockFifoService $stockFifoService)
+    {
+        $this->cartService = $cartService;
+        $this->stockFifoService = $stockFifoService;
+    }
 
     protected function rules()
     {
         return [
             'client_id' => 'required|exists:clients,id',
-            'total' => 'required|numeric|min:0',
-            'remise_totale' => 'nullable|numeric|min:0|lte:total',
             'montant_paye' => 'required|numeric|min:0',
-            'lignes' => 'required|array|min:1',
-            'lignes.*.article_id' => 'required|exists:articles,id',
-            'lignes.*.lot_id' => 'required|exists:lots,id',
-            'lignes.*.quantite' => 'required|integer|min:1',
-            'lignes.*.prix_unitaire' => 'required|numeric|min:0',
-            'lignes.*.remise_ligne' => 'nullable|numeric|min:0',
         ];
     }
 
     protected $messages = [
         'client_id.required' => 'Veuillez sélectionner un client.',
         'client_id.exists' => 'Le client sélectionné n\'existe pas.',
-        'total.required' => 'Le montant total est obligatoire.',
-        'total.min' => 'Le montant total doit être positif.',
-        'remise_totale.lte' => 'La remise ne peut pas dépasser le montant total.',
         'montant_paye.required' => 'Le montant payé est obligatoire.',
         'montant_paye.min' => 'Le montant payé doit être positif.',
-        'lignes.required' => 'Veuillez ajouter au moins un article à la vente.',
-        'lignes.min' => 'Veuillez ajouter au moins un article à la vente.',
-        'lignes.*.article_id.required' => 'Veuillez sélectionner un article.',
-        'lignes.*.lot_id.required' => 'Veuillez sélectionner un lot.',
-        'lignes.*.quantite.required' => 'La quantité est obligatoire.',
-        'lignes.*.quantite.min' => 'La quantité doit être d\'au moins 1.',
-        'lignes.*.prix_unitaire.required' => 'Le prix unitaire est obligatoire.',
-        'lignes.*.prix_unitaire.min' => 'Le prix unitaire doit être positif.',
     ];
 
     public function mount()
     {
         $this->resetForm();
+        $this->rafraichirPanier();
     }
 
     public function updatedSearch()
@@ -112,6 +105,7 @@ class VenteManager extends Component
         $this->resetForm();
         $this->showModal = true;
         $this->editMode = false;
+        $this->viderPanier();
     }
 
     public function closeModal()
@@ -119,6 +113,7 @@ class VenteManager extends Component
         $this->showModal = false;
         $this->resetForm();
         $this->resetValidation();
+        $this->viderPanier();
     }
 
     public function resetForm()
@@ -128,162 +123,163 @@ class VenteManager extends Component
         $this->total = 0;
         $this->remise_totale = 0;
         $this->montant_paye = 0;
-        $this->lignes = [];
         $this->selectedArticle = null;
-        $this->selectedLot = null;
         $this->quantite = 1;
-        $this->prix_unitaire = 0;
         $this->remise_ligne = 0;
     }
 
-    public function updatedSelectedArticle()
+    public function openCartModal()
     {
-        if ($this->selectedArticle) {
-            // Réinitialiser le lot sélectionné
-            $this->selectedLot = null;
-            $this->prix_unitaire = 0;
-        }
+        $this->showCartModal = true;
+        $this->rafraichirPanier();
     }
 
-    public function updatedSelectedLot()
+    public function closeCartModal()
     {
-        if ($this->selectedLot) {
-            $lot = Lot::find($this->selectedLot);
-            if ($lot) {
-                $this->prix_unitaire = $lot->prix_vente;
-            }
-        }
+        $this->showCartModal = false;
     }
 
-    public function ajouterLigne()
+    public function ajouterAuPanier()
     {
-        // Validation des champs de la ligne
         $this->validate([
             'selectedArticle' => 'required|exists:articles,id',
-            'selectedLot' => 'required|exists:lots,id',
             'quantite' => 'required|integer|min:1',
-            'prix_unitaire' => 'required|numeric|min:0',
-            'remise_ligne' => 'nullable|numeric|min:0',
+            'remise_ligne' => 'nullable|numeric|min:0|max:100',
         ], [
             'selectedArticle.required' => 'Veuillez sélectionner un article.',
-            'selectedLot.required' => 'Veuillez sélectionner un lot.',
             'quantite.required' => 'La quantité est obligatoire.',
             'quantite.min' => 'La quantité doit être d\'au moins 1.',
-            'prix_unitaire.required' => 'Le prix unitaire est obligatoire.',
-            'prix_unitaire.min' => 'Le prix unitaire doit être positif.',
+            'remise_ligne.max' => 'La remise ne peut pas dépasser 100%.',
         ]);
 
-        // Vérifier le stock disponible
-        $lot = Lot::find($this->selectedLot);
-        if (!$lot || $lot->quantite_restante < $this->quantite) {
-            $this->alert('error', 'Stock insuffisant pour ce lot.');
-            return;
+        try {
+            $result = $this->cartService->ajouterArticle(
+                $this->selectedArticle,
+                $this->quantite,
+                $this->remise_ligne ?? 0
+            );
+
+            $this->alert('success', $result['message']);
+            $this->rafraichirPanier();
+
+            // Réinitialiser les champs
+            $this->selectedArticle = null;
+            $this->quantite = 1;
+            $this->remise_ligne = 0;
+        } catch (\Exception $e) {
+            $this->alert('error', $e->getMessage());
         }
-
-        // Vérifier si l'article/lot n'est pas déjà dans la liste
-        $existingIndex = collect($this->lignes)->search(function ($ligne) {
-            return $ligne['article_id'] == $this->selectedArticle && $ligne['lot_id'] == $this->selectedLot;
-        });
-
-        if ($existingIndex !== false) {
-            // Mettre à jour la ligne existante
-            $this->lignes[$existingIndex]['quantite'] += $this->quantite;
-        } else {
-            // Ajouter une nouvelle ligne
-            $article = Article::find($this->selectedArticle);
-            $this->lignes[] = [
-                'article_id' => $this->selectedArticle,
-                'article_nom' => $article->designation,
-                'lot_id' => $this->selectedLot,
-                'lot_numero' => $lot->numero_lot,
-                'quantite' => $this->quantite,
-                'prix_unitaire' => $this->prix_unitaire,
-                'prix_achat' => $lot->prix_achat,
-                'remise_ligne' => $this->remise_ligne ?? 0,
-            ];
-        }
-
-        // Calculer le total
-        $this->calculerTotal();
-
-        // Réinitialiser les champs
-        $this->selectedArticle = null;
-        $this->selectedLot = null;
-        $this->quantite = 1;
-        $this->prix_unitaire = 0;
-        $this->remise_ligne = 0;
     }
 
-    public function supprimerLigne($index)
+    public function mettreAJourQuantitePanier($articleId, $nouvelleQuantite)
     {
-        unset($this->lignes[$index]);
-        $this->lignes = array_values($this->lignes);
-        $this->calculerTotal();
+        try {
+            $result = $this->cartService->mettreAJourQuantite($articleId, $nouvelleQuantite);
+            $this->alert('success', $result['message']);
+            $this->rafraichirPanier();
+        } catch (\Exception $e) {
+            $this->alert('error', $e->getMessage());
+        }
     }
 
-    public function calculerTotal()
+    public function retirerDuPanier($articleId)
     {
-        $this->total = collect($this->lignes)->sum(function ($ligne) {
-            return ($ligne['prix_unitaire'] * $ligne['quantite']) - ($ligne['remise_ligne'] ?? 0);
-        });
+        try {
+            $result = $this->cartService->retirerArticle($articleId);
+            $this->alert('success', $result['message']);
+            $this->rafraichirPanier();
+        } catch (\Exception $e) {
+            $this->alert('error', $e->getMessage());
+        }
+    }
+
+    public function viderPanier()
+    {
+        try {
+            $this->cartService->viderPanier();
+            $this->rafraichirPanier();
+        } catch (\Exception $e) {
+            $this->alert('error', $e->getMessage());
+        }
+    }
+
+    public function appliquerRemisePanier($articleId, $remise)
+    {
+        try {
+            $result = $this->cartService->appliquerRemise($articleId, $remise);
+            $this->alert('success', $result['message']);
+            $this->rafraichirPanier();
+        } catch (\Exception $e) {
+            $this->alert('error', $e->getMessage());
+        }
+    }
+
+    public function rafraichirPanier()
+    {
+        $contenu = $this->cartService->getContenuPanier();
+        $this->contenuPanier = $contenu['items']->toArray();
+        $this->total = $contenu['total'];
     }
 
     public function save()
     {
+        // Valider le panier
+        $validation = $this->cartService->validerPanier();
+        if (!$validation['valide']) {
+            foreach ($validation['erreurs'] as $erreur) {
+                $this->alert('error', $erreur);
+            }
+            return;
+        }
+
         $this->validate();
 
         try {
             DB::transaction(function () {
-                if ($this->editMode) {
-                    $vente = Vente::findOrFail($this->venteId);
-
-                    // Restaurer le stock des anciennes lignes
-                    foreach ($vente->ligneVentes as $ancienneLigne) {
-                        $lot = $ancienneLigne->lot;
-                        $lot->quantite_restante += $ancienneLigne->quantite;
-                        $lot->save();
-                    }
-
-                    // Supprimer les anciennes lignes
-                    $vente->ligneVentes()->delete();
-                } else {
-                    $vente = new Vente();
-                }
-
-                // Sauvegarder la vente
-                $vente->fill([
+                // Créer la vente
+                $vente = Vente::create([
                     'utilisateur_id' => auth()->id(),
                     'client_id' => $this->client_id,
                     'total' => $this->total,
                     'remise_totale' => $this->remise_totale ?? 0,
                     'montant_paye' => $this->montant_paye,
                 ]);
-                $vente->save();
 
-                // Sauvegarder les lignes de vente
-                foreach ($this->lignes as $ligne) {
-                    // Vérifier et réduire le stock
-                    $lot = Lot::find($ligne['lot_id']);
-                    if (!$lot->hasStock($ligne['quantite'])) {
-                        throw new \Exception("Stock insuffisant pour l'article {$ligne['article_nom']}");
+                // Obtenir les informations de facturation du panier
+                $infosFacturation = $this->cartService->getInfosFacturation();
+
+                // Créer les lignes de vente et appliquer FIFO
+                foreach ($infosFacturation['lignes_vente'] as $ligne) {
+                    // Appliquer la déduction FIFO
+                    $lotsUtilises = $this->stockFifoService->deduireStock(
+                        $ligne['article_id'],
+                        $ligne['quantite']
+                    );
+
+                    $this->stockFifoService->appliquerDeduction($lotsUtilises);
+
+                    // Créer les lignes de vente pour chaque lot utilisé
+                    foreach ($lotsUtilises as $lotUtilise) {
+                        LigneVente::create([
+                            'vente_id' => $vente->id,
+                            'article_id' => $ligne['article_id'],
+                            'lot_id' => $lotUtilise['lot_id'],
+                            'quantite' => $lotUtilise['quantite_deduite'],
+                            'prix_unitaire' => $lotUtilise['prix_vente'],
+                            'prix_achat' => $lotUtilise['prix_achat'],
+                            'remise_ligne' => ($ligne['remise_pourcentage'] * $lotUtilise['prix_vente'] * $lotUtilise['quantite_deduite']) / 100,
+                        ]);
                     }
-
-                    $lot->reduireStock($ligne['quantite']);
-
-                    // Créer la ligne de vente
-                    LigneVente::create([
-                        'vente_id' => $vente->id,
-                        'article_id' => $ligne['article_id'],
-                        'lot_id' => $ligne['lot_id'],
-                        'quantite' => $ligne['quantite'],
-                        'prix_unitaire' => $ligne['prix_unitaire'],
-                        'prix_achat' => $ligne['prix_achat'],
-                        'remise_ligne' => $ligne['remise_ligne'] ?? 0,
-                    ]);
                 }
+
+                // Vider le panier après succès
+                $this->cartService->viderPanier();
+
+                // Rediriger vers l'impression de facture
+                $this->dispatch('imprimer-facture', venteId: $vente->id);
             });
 
-            $this->alert('success', $this->editMode ? 'Vente modifiée avec succès!' : 'Nouvelle vente créée avec succès!');
+            $this->alert('success', 'Vente créée avec succès! Impression de la facture...');
             $this->closeModal();
         } catch (\Exception $e) {
             $this->alert('error', 'Une erreur est survenue: ' . $e->getMessage());
@@ -299,20 +295,6 @@ class VenteManager extends Component
         $this->total = $vente->total;
         $this->remise_totale = $vente->remise_totale;
         $this->montant_paye = $vente->montant_paye;
-
-        // Charger les lignes
-        $this->lignes = $vente->ligneVentes->map(function ($ligne) {
-            return [
-                'article_id' => $ligne->article_id,
-                'article_nom' => $ligne->article->designation,
-                'lot_id' => $ligne->lot_id,
-                'lot_numero' => $ligne->lot->numero_lot,
-                'quantite' => $ligne->quantite,
-                'prix_unitaire' => $ligne->prix_unitaire,
-                'prix_achat' => $ligne->prix_achat,
-                'remise_ligne' => $ligne->remise_ligne,
-            ];
-        })->toArray();
 
         $this->editMode = true;
         $this->showModal = true;
@@ -337,7 +319,7 @@ class VenteManager extends Component
             DB::transaction(function () use ($venteId) {
                 $vente = Vente::with('ligneVentes')->findOrFail($venteId);
 
-                // Restaurer le stock
+                // Restaurer le stock avec FIFO inverse
                 foreach ($vente->ligneVentes as $ligne) {
                     $lot = $ligne->lot;
                     $lot->quantite_restante += $ligne->quantite;
@@ -403,17 +385,9 @@ class VenteManager extends Component
         return Article::where('actif', true)->orderBy('designation')->get();
     }
 
-    public function getLotsForArticle()
+    public function getStockDisponible($articleId)
     {
-        if (!$this->selectedArticle) {
-            return collect();
-        }
-
-        return Lot::where('article_id', $this->selectedArticle)
-            ->where('quantite_restante', '>', 0)
-            ->with(['ville'])
-            ->orderBy('date_arrivee', 'desc')
-            ->get();
+        return $this->stockFifoService->getStockDisponible($articleId);
     }
 
     public function render()
@@ -422,7 +396,6 @@ class VenteManager extends Component
             'ventes' => $this->getVentes(),
             'clients' => $this->getClients(),
             'articles' => $this->getArticles(),
-            'lotsDisponibles' => $this->getLotsForArticle(),
         ]);
     }
 }
