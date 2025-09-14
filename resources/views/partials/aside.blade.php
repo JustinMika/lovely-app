@@ -527,9 +527,10 @@
                             </ul>
                         </div>
                         <!-- Menu Group -->
+                    </li>
+                </ul>
+            </div>
         </nav>
         <!-- Sidebar Menu -->
-    </div>
-    </div>
     </div>
 </aside>
