@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Rapport des Ventes')
+@section('title', 'Gestion des Rôles')
 
 @section('content')
     <!-- Breadcrumb Start -->
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-title-md2 font-bold text-gray-800 dark:text-white/90">
-            Rapport des Ventes
+            Gestion des Rôles
         </h2>
         <nav>
             <ol class="flex items-center gap-2">
@@ -14,7 +14,7 @@
                     <a class="font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                         href="{{ route('dashboard') }}">Tableau de bord /</a>
                 </li>
-                <li class="font-medium text-gray-800 dark:text-white/90">Rapports / Ventes</li>
+                <li class="font-medium text-gray-800 dark:text-white/90">Rôles</li>
             </ol>
         </nav>
     </div>
@@ -25,7 +25,7 @@
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-800">
                 <h2 class="text-lg font-medium text-gray-800 dark:text-white">
-                    Analyse des Ventes
+                    Liste des Rôles
                 </h2>
             </div>
             <div class="p-4 sm:p-6">
@@ -33,13 +33,13 @@
                     <div class="mx-auto h-12 w-12 text-gray-400">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
                             </path>
                         </svg>
                     </div>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Rapport des ventes</h3>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Aucun rôle</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Les statistiques et analyses des ventes apparaîtront ici.
+                        Les rôles utilisateur apparaîtront ici.
                     </p>
                 </div>
             </div>

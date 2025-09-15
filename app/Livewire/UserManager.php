@@ -14,7 +14,7 @@ use Illuminate\Validation\Rule;
 
 class UserManager extends Component
 {
-    use WithPagination, LivewireAlert;
+    use WithPagination;
 
     // Propriétés de recherche et tri
     public $search = '';

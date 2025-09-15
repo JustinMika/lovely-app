@@ -5,11 +5,11 @@ namespace App\Livewire;
 use App\Models\Article;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
 class ArticleManager extends Component
 {
-	use WithPagination, LivewireAlert;
+	use WithPagination;
 
 	// Propriétés pour le formulaire
 	public $designation = '';
@@ -79,19 +79,29 @@ class ArticleManager extends Component
 
 	public function store()
 	{
-		$this->validate();
-
 		try {
+			$this->validate();
+
 			Article::create([
 				'designation' => $this->designation,
 				'description' => $this->description,
 				'actif' => $this->actif,
 			]);
 
-			$this->closeModal();
-			$this->alert('success', 'Article créé avec succès !');
+			$this->resetForm();
+			$this->showModal = false;
+
+			LivewireAlert::title('Succès!')
+				->text('Article créé avec succès.')
+				->success()
+				->position('center')
+				->timer(3000)
+				->show();
 		} catch (\Exception $e) {
-			$this->alert('error', 'Erreur lors de la création de l\'article.');
+			LivewireAlert::title('Erreur!')
+				->text('Erreur lors de la création de l\'article.')
+				->error()
+				->show();
 		}
 	}
 
@@ -112,10 +122,9 @@ class ArticleManager extends Component
 	{
 		$rules = $this->rules;
 		$rules['designation'] = 'required|string|max:255|unique:articles,designation,' . $this->articleId;
-
-		$this->validate($rules);
-
 		try {
+			$this->validate();
+
 			$article = Article::findOrFail($this->articleId);
 			$article->update([
 				'designation' => $this->designation,
@@ -123,38 +132,62 @@ class ArticleManager extends Component
 				'actif' => $this->actif,
 			]);
 
-			$this->closeModal();
-			$this->alert('success', 'Article modifié avec succès !');
+			$this->resetForm();
+			$this->showModal = false;
+			$this->articleId = null;
+
+			LivewireAlert::title('Succès!')
+				->text('Article modifié avec succès.')
+				->success()
+				->position('center')
+				->timer(3000)
+				->show();
 		} catch (\Exception $e) {
-			$this->alert('error', 'Erreur lors de la modification de l\'article.');
+			LivewireAlert::title('Erreur!')
+				->text('Erreur lors de la modification de l\'article.')
+				->error()
+				->show();
 		}
 	}
 
-	public function confirmDelete($id)
+	public function delete($id)
 	{
-		$this->confirm('Êtes-vous sûr de vouloir supprimer cet article ?', [
-			'confirmButtonText' => 'Oui, supprimer',
-			'cancelButtonText' => 'Annuler',
-			'onConfirmed' => 'delete',
-			'data' => ['id' => $id]
-		]);
+		LivewireAlert::title('Êtes-vous sûr?')
+			->text('Cette action ne peut pas être annulée.')
+			->warning()
+			->withConfirmButton('Oui, supprimer!')
+			->withCancelButton('Annuler')
+			->confirmButtonColor('#d33')
+			->onConfirm('deleteConfirmed', ['id' => $id])
+			->show();
 	}
 
-	public function delete($data)
+	public function deleteConfirmed($data)
 	{
 		try {
 			$article = Article::findOrFail($data['id']);
-
 			// Vérifier s'il y a des lots associés
 			if ($article->lots()->count() > 0) {
-				$this->alert('error', 'Impossible de supprimer cet article car il a des lots associés.');
+				LivewireAlert::title('Erreur!')
+					->text('Impossible de supprimer cet article car il a des lots associés.')
+					->error()
+					->show();
 				return;
 			}
 
 			$article->delete();
-			$this->alert('success', 'Article supprimé avec succès !');
+
+			LivewireAlert::title('Supprimé!')
+				->text('Article supprimé avec succès.')
+				->success()
+				->position('center')
+				->timer(3000)
+				->show();
 		} catch (\Exception $e) {
-			$this->alert('error', 'Erreur lors de la suppression de l\'article.');
+			LivewireAlert::title('Erreur!')
+				->text('Erreur lors de la suppression de l\'article.')
+				->error()
+				->show();
 		}
 	}
 
@@ -165,9 +198,17 @@ class ArticleManager extends Component
 			$article->update(['actif' => !$article->actif]);
 
 			$status = $article->actif ? 'activé' : 'désactivé';
-			$this->alert('success', "Article {$status} avec succès !");
+			LivewireAlert::title('Succès!')
+				->text("Article {$status} avec succès.")
+				->success()
+				->position('center')
+				->timer(3000)
+				->show();
 		} catch (\Exception $e) {
-			$this->alert('error', 'Erreur lors du changement de statut.');
+			LivewireAlert::title('Erreur!')
+				->text('Erreur lors du changement de statut.')
+				->error()
+				->show();
 		}
 	}
 

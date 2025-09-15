@@ -11,7 +11,7 @@ use Livewire\Attributes\On;
 
 class ClientManager extends Component
 {
-    use WithPagination, LivewireAlert;
+    use WithPagination;
 
     // Propriétés de recherche et tri
     public $search = '';

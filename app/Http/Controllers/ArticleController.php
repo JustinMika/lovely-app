@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ArticleController extends Controller
 {
@@ -12,14 +14,13 @@ class ArticleController extends Controller
 	 */
 	public function index(): View
 	{
-		// TODO: Implement article retrieval logic
-		$articles = collect(); // Placeholder for articles
+		$articles = Article::latest()->paginate(10);
 
 		$metrics = [
-			'total_articles' => 1245,
-			'total_value' => 89450,
-			'out_of_stock' => 23,
-			'new_this_month' => 156
+			'total_articles' => Article::count(),
+			'active_articles' => Article::where('actif', true)->count(),
+			'inactive_articles' => Article::where('actif', false)->count(),
+			'recent_articles' => Article::where('created_at', '>=', now()->subMonth())->count()
 		];
 
 		return view('pages.articles.index', compact('articles', 'metrics'));
@@ -36,18 +37,18 @@ class ArticleController extends Controller
 	/**
 	 * Store a newly created article in storage.
 	 */
-	public function store(Request $request)
+	public function store(Request $request): RedirectResponse
 	{
-		// TODO: Implement article creation logic
 		$validated = $request->validate([
-			'name' => 'required|string|max:255',
+			'designation' => 'required|string|max:255',
 			'description' => 'nullable|string',
-			'price' => 'required|numeric|min:0',
-			'stock_quantity' => 'required|integer|min:0',
-			'category_id' => 'nullable|exists:categories,id',
+			'actif' => 'boolean',
 		]);
 
-		// Article::create($validated);
+		// Set default value for actif if not provided
+		$validated['actif'] = $request->has('actif') ? (bool) $request->actif : true;
+
+		Article::create($validated);
 
 		return redirect()->route('articles.index')
 			->with('success', 'Article créé avec succès.');
@@ -56,41 +57,37 @@ class ArticleController extends Controller
 	/**
 	 * Display the specified article.
 	 */
-	public function show(string $id): View
+	public function show(Article $article): View
 	{
-		// TODO: Implement article retrieval logic
-		// $article = Article::findOrFail($id);
+		// Load relationships if needed
+		$article->load(['lots']);
 
-		return view('pages.articles.show', compact('id'));
+		return view('pages.articles.show', compact('article'));
 	}
 
 	/**
 	 * Show the form for editing the specified article.
 	 */
-	public function edit(string $id): View
+	public function edit(Article $article): View
 	{
-		// TODO: Implement article retrieval logic
-		// $article = Article::findOrFail($id);
-
-		return view('pages.articles.edit', compact('id'));
+		return view('pages.articles.edit', compact('article'));
 	}
 
 	/**
 	 * Update the specified article in storage.
 	 */
-	public function update(Request $request, string $id)
+	public function update(Request $request, Article $article): RedirectResponse
 	{
-		// TODO: Implement article update logic
 		$validated = $request->validate([
-			'name' => 'required|string|max:255',
+			'designation' => 'required|string|max:255|unique:articles,designation,' . $article->id,
 			'description' => 'nullable|string',
-			'price' => 'required|numeric|min:0',
-			'stock_quantity' => 'required|integer|min:0',
-			'category_id' => 'nullable|exists:categories,id',
+			'actif' => 'boolean',
 		]);
 
-		// $article = Article::findOrFail($id);
-		// $article->update($validated);
+		// Set default value for actif if not provided
+		$validated['actif'] = $request->has('actif') ? (bool) $request->actif : false;
+
+		$article->update($validated);
 
 		return redirect()->route('articles.index')
 			->with('success', 'Article mis à jour avec succès.');
@@ -99,11 +96,21 @@ class ArticleController extends Controller
 	/**
 	 * Remove the specified article from storage.
 	 */
-	public function destroy(string $id)
+	public function destroy(Article $article): RedirectResponse
 	{
-		// TODO: Implement article deletion logic
-		// $article = Article::findOrFail($id);
-		// $article->delete();
+		// Check if article has associated lots
+		if ($article->lots()->count() > 0) {
+			return redirect()->route('articles.index')
+				->with('error', 'Impossible de supprimer cet article car il a des lots associés.');
+		}
+
+		// Check if article has associated sales
+		if ($article->ligneVentes()->count() > 0) {
+			return redirect()->route('articles.index')
+				->with('error', 'Impossible de supprimer cet article car il a des ventes associées.');
+		}
+
+		$article->delete();
 
 		return redirect()->route('articles.index')
 			->with('success', 'Article supprimé avec succès.');
