@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lot;
+use App\Models\Article;
+use App\Models\Ville;
+use App\Models\Approvisionnement;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class LotController extends Controller
 {
@@ -12,14 +17,20 @@ class LotController extends Controller
 	 */
 	public function index(): View
 	{
-		// TODO: Implement lot retrieval logic
-		$lots = collect(); // Placeholder for lots
+		$lots = Lot::with(['article', 'ville', 'approvisionnement'])
+			->orderBy('created_at', 'desc')
+			->paginate(15);
+
+		$totalLots = Lot::count();
+		$totalValue = Lot::sum(DB::raw('quantite_restante * prix_vente'));
+		$expiredLots = Lot::where('date_arrivee', '<', now()->subDays(365))->count();
+		$lowStockLots = Lot::where('quantite_restante', '<=', 10)->count();
 
 		$metrics = [
-			'total_lots' => 456,
-			'total_value' => 125000,
-			'expired_lots' => 12,
-			'low_stock_lots' => 34
+			'total_lots' => $totalLots,
+			'total_value' => $totalValue,
+			'expired_lots' => $expiredLots,
+			'low_stock_lots' => $lowStockLots
 		];
 
 		return view('pages.stock.lots', compact('lots', 'metrics'));
@@ -30,11 +41,11 @@ class LotController extends Controller
 	 */
 	public function create(): View
 	{
-		// TODO: Get articles and suppliers for dropdowns
-		$articles = collect(); // Placeholder
-		$villes = collect(); // Placeholder
+		$articles = Article::where('actif', true)->orderBy('designation')->get();
+		$villes = Ville::orderBy('nom')->get();
+		$approvisionnements = Approvisionnement::orderBy('date', 'desc')->get();
 
-		return view('pages.stock.create-lot', compact('articles', 'villes'));
+		return view('pages.stock.create-lot', compact('articles', 'villes', 'approvisionnements'));
 	}
 
 	/**
@@ -42,19 +53,20 @@ class LotController extends Controller
 	 */
 	public function store(Request $request)
 	{
-		// TODO: Implement lot creation logic
 		$validated = $request->validate([
 			'approvisionnement_id' => 'required|exists:approvisionnements,id',
 			'article_id' => 'required|exists:articles,id',
 			'ville_id' => 'required|exists:villes,id',
-			'numero_lot' => 'required|string|max:255',
+			'numero_lot' => 'required|string|max:255|unique:lots,numero_lot',
 			'quantite_initiale' => 'required|integer|min:1',
 			'prix_achat' => 'required|numeric|min:0',
 			'prix_vente' => 'required|numeric|min:0',
 			'date_arrivee' => 'required|date',
 		]);
 
-		// Lot::create($validated);
+		$validated['quantite_restante'] = $validated['quantite_initiale'];
+
+		Lot::create($validated);
 
 		return redirect()->route('lots.index')
 			->with('success', 'Lot créé avec succès.');
@@ -65,10 +77,9 @@ class LotController extends Controller
 	 */
 	public function show(string $id): View
 	{
-		// TODO: Implement lot retrieval logic
-		// $lot = Lot::with(['article', 'ville', 'approvisionnement'])->findOrFail($id);
+		$lot = Lot::with(['article', 'ville', 'approvisionnement', 'ligneVentes'])->findOrFail($id);
 
-		return view('pages.stock.show-lot', compact('id'));
+		return view('pages.stock.show-lot', compact('lot'));
 	}
 
 	/**
@@ -76,12 +87,12 @@ class LotController extends Controller
 	 */
 	public function edit(string $id): View
 	{
-		// TODO: Implement lot retrieval logic
-		// $lot = Lot::findOrFail($id);
-		$articles = collect(); // Placeholder
-		$villes = collect(); // Placeholder
+		$lot = Lot::findOrFail($id);
+		$articles = Article::where('actif', true)->orderBy('designation')->get();
+		$villes = Ville::orderBy('nom')->get();
+		$approvisionnements = Approvisionnement::orderBy('date', 'desc')->get();
 
-		return view('pages.stock.edit-lot', compact('id', 'articles', 'villes'));
+		return view('pages.stock.edit-lot', compact('lot', 'articles', 'villes', 'approvisionnements'));
 	}
 
 	/**
@@ -89,17 +100,20 @@ class LotController extends Controller
 	 */
 	public function update(Request $request, string $id)
 	{
-		// TODO: Implement lot update logic
+		$lot = Lot::findOrFail($id);
+
 		$validated = $request->validate([
-			'numero_lot' => 'required|string|max:255',
+			'approvisionnement_id' => 'required|exists:approvisionnements,id',
+			'article_id' => 'required|exists:articles,id',
+			'ville_id' => 'required|exists:villes,id',
+			'numero_lot' => 'required|string|max:255|unique:lots,numero_lot,' . $id,
 			'quantite_initiale' => 'required|integer|min:1',
 			'prix_achat' => 'required|numeric|min:0',
 			'prix_vente' => 'required|numeric|min:0',
 			'date_arrivee' => 'required|date',
 		]);
 
-		// $lot = Lot::findOrFail($id);
-		// $lot->update($validated);
+		$lot->update($validated);
 
 		return redirect()->route('lots.index')
 			->with('success', 'Lot mis à jour avec succès.');
@@ -110,9 +124,15 @@ class LotController extends Controller
 	 */
 	public function destroy(string $id)
 	{
-		// TODO: Implement lot deletion logic
-		// $lot = Lot::findOrFail($id);
-		// $lot->delete();
+		$lot = Lot::findOrFail($id);
+
+		// Vérifier s'il y a des ventes associées
+		if ($lot->ligneVentes()->count() > 0) {
+			return redirect()->route('lots.index')
+				->with('error', 'Impossible de supprimer ce lot car il a des ventes associées.');
+		}
+
+		$lot->delete();
 
 		return redirect()->route('lots.index')
 			->with('success', 'Lot supprimé avec succès.');

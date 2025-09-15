@@ -41,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
 
 	// Stock & Approvisionnement - Admin/Gérant/Caissier
 	Route::prefix('stock')->name('stock.')->middleware(['role:Admin,Gérant,Caissier'])->controller(App\Http\Controllers\StockController::class)->group(function () {
-		Route::get('/', 'index')->name('index');
+		Route::get('/', 'view')->name('index');
 		Route::get('/alerts', 'alerts')->name('alerts');
 		Route::get('/movements', 'movements')->name('movements');
 		Route::put('/update-quantity/{articleId}', 'updateQuantity')->name('updateQuantity');
@@ -51,6 +51,12 @@ Route::middleware(['auth'])->group(function () {
 	Route::middleware(['role:Admin,Gérant'])->group(function () {
 		Route::resource('lots', App\Http\Controllers\LotController::class);
 		Route::get('lots/export/pdf', [App\Http\Controllers\LotExportController::class, 'exportPdf'])->name('lots.export.pdf');
+	});
+
+	// Gestion des approvisionnements - Admin/Gérant only
+	Route::middleware(['role:Admin,Gérant'])->group(function () {
+		Route::resource('approvisionnements', App\Http\Controllers\ApprovisionnementController::class);
+		Route::get('approvisionnements-stats', [App\Http\Controllers\ApprovisionnementController::class, 'stats'])->name('approvisionnements.stats');
 	});
 
 	// Ventes - All authenticated users
