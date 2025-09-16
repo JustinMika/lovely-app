@@ -59,9 +59,11 @@ class LotController extends Controller
 			'ville_id' => 'required|exists:villes,id',
 			'numero_lot' => 'required|string|max:255|unique:lots,numero_lot',
 			'quantite_initiale' => 'required|integer|min:1',
+			'seuil_alerte' => 'required|integer|min:0',
 			'prix_achat' => 'required|numeric|min:0',
 			'prix_vente' => 'required|numeric|min:0',
 			'date_arrivee' => 'required|date',
+			'date_expiration' => 'nullable|date|after:date_arrivee',
 		]);
 
 		$validated['quantite_restante'] = $validated['quantite_initiale'];
@@ -108,9 +110,11 @@ class LotController extends Controller
 			'ville_id' => 'required|exists:villes,id',
 			'numero_lot' => 'required|string|max:255|unique:lots,numero_lot,' . $id,
 			'quantite_initiale' => 'required|integer|min:1',
+			'seuil_alerte' => 'required|integer|min:0',
 			'prix_achat' => 'required|numeric|min:0',
 			'prix_vente' => 'required|numeric|min:0',
 			'date_arrivee' => 'required|date',
+			'date_expiration' => 'nullable|date|after:date_arrivee',
 		]);
 
 		$lot->update($validated);

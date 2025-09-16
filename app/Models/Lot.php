@@ -18,13 +18,16 @@ class Lot extends Model
         'numero_lot',
         'quantite_initiale',
         'quantite_restante',
+        'seuil_alerte',
         'prix_achat',
         'prix_vente',
         'date_arrivee',
+        'date_expiration',
     ];
 
     protected $casts = [
         'date_arrivee' => 'date',
+        'date_expiration' => 'date',
         'prix_achat' => 'decimal:2',
         'prix_vente' => 'decimal:2',
     ];

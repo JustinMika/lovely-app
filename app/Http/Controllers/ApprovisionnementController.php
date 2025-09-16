@@ -58,13 +58,13 @@ class ApprovisionnementController extends Controller
 			'lots' => 'required|array|min:1',
 			'lots.*.article_id' => 'required|exists:articles,id',
 			'lots.*.ville_id' => 'required|exists:villes,id',
-			'lots.*.numero_lot' => 'required|string|max:255|unique:lots,numero_lot',
+			'lots.*.numero_lot' => 'required|string|max:255',
 			'lots.*.quantite_initiale' => 'required|integer|min:1',
 			'lots.*.unite' => 'required|string|max:50',
 			'lots.*.prix_achat' => 'required|numeric|min:0',
 			'lots.*.prix_vente' => 'required|numeric|min:0',
-			'lots.*.date_arrivee' => 'nullable|date',
-			'lots.*.date_expiration' => 'nullable|date|after:date_arrivee',
+			'lots.*.date_arrivee' => 'required|date',
+			'lots.*.date_expiration' => 'nullable|date|after:lots.*.date_arrivee',
 			'lots.*.seuil_alerte' => 'required|integer|min:0',
 		]);
 

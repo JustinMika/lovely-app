@@ -1,5 +1,9 @@
  <link rel="icon" href="{{ asset('favicon.ico') }}">
- <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<!-- Filament Forms CSS -->
+@filamentStyles
+<!-- Alpine.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
  <script data-cfasync="false" nonce="560e5423-b76c-4494-9a84-5378df1ec35f">
      try {
          (function(w, d) {

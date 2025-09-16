@@ -162,6 +162,20 @@
                     @enderror
                 </div>
 
+                <!-- Seuil d'Alerte -->
+                <div>
+                    <label for="seuil_alerte" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Seuil d'Alerte <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" name="seuil_alerte" id="seuil_alerte" required min="0"
+                        value="{{ old('seuil_alerte', $lot->seuil_alerte ?? 10) }}"
+                        placeholder="Ex: 10"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+                    @error('seuil_alerte')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Date d'Arrivée -->
                 <div>
                     <label for="date_arrivee" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -171,6 +185,19 @@
                         value="{{ old('date_arrivee', $lot->date_arrivee->format('Y-m-d')) }}"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('date_arrivee')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Date d'Expiration -->
+                <div>
+                    <label for="date_expiration" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                        Date d'Expiration
+                    </label>
+                    <input type="date" name="date_expiration" id="date_expiration"
+                        value="{{ old('date_expiration', $lot->date_expiration?->format('Y-m-d')) }}"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+                    @error('date_expiration')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                     @enderror
                 </div>
