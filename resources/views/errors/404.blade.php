@@ -39,7 +39,7 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
                 ERROR
             </h1>
 
-            <img src="{{ assety('images/error/404.svg') }}" alt="404" class="dark:hidden" />
+            <img src="{{ asset('images/error/404.svg') }}" alt="404" class="dark:hidden" />
             <img src="{{ asset('images/error/404-dark.svg') }}" alt="404" class="hidden dark:block" />
 
             <p class="mb-6 mt-10 text-base text-gray-700 dark:text-gray-400 sm:text-lg">

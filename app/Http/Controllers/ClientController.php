@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ClientController extends Controller
 {
@@ -12,14 +14,13 @@ class ClientController extends Controller
 	 */
 	public function index(): View
 	{
-		// TODO: Implement client retrieval logic
-		$clients = collect(); // Placeholder for clients
+		$clients = Client::latest()->paginate(10);
 
 		$metrics = [
-			'total_clients' => 856,
-			'new_this_month' => 42,
-			'active_clients' => 734,
-			'total_revenue' => 245680
+			'total_clients' => Client::count(),
+			'new_this_month' => Client::where('created_at', '>=', now()->subMonth())->count(),
+			'active_clients' => Client::whereHas('ventes')->count(),
+			'total_revenue' => Client::whereHas('ventes')->withSum('ventes', 'total')->get()->sum('ventes_sum_total') ?? 0
 		];
 
 		return view('pages.clients.index', compact('clients', 'metrics'));
@@ -36,19 +37,15 @@ class ClientController extends Controller
 	/**
 	 * Store a newly created client in storage.
 	 */
-	public function store(Request $request)
+	public function store(Request $request): RedirectResponse
 	{
 		$validated = $request->validate([
-			'name' => 'required|string|max:255',
-			'email' => 'required|email|unique:clients,email',
-			'phone' => 'nullable|string|max:20',
-			'address' => 'nullable|string',
-			'company' => 'nullable|string|max:255',
-			'status' => 'required|in:active,inactive',
+			'nom' => 'required|string|max:255',
+			'email' => 'nullable|email|unique:clients,email',
+			'telephone' => 'nullable|string|max:14',
 		]);
 
-		// TODO: Implement client creation logic
-		// Client::create($validated);
+		Client::create($validated);
 
 		return redirect()->route('clients.index')
 			->with('success', 'Client créé avec succès.');
@@ -57,42 +54,40 @@ class ClientController extends Controller
 	/**
 	 * Display the specified client.
 	 */
-	public function show(string $id): View
+	public function show(Client $client): View
 	{
-		// TODO: Implement client retrieval logic
-		// $client = Client::findOrFail($id);
+		$client->load(['ventes.ligneVentes']);
 
-		return view('pages.clients.show', compact('id'));
+		$clientStats = [
+			'total_ventes' => $client->ventes->count(),
+			'total_depense' => $client->ventes->sum('total'),
+			'derniere_vente' => $client->ventes->first()?->created_at,
+			'articles_achetes' => $client->ventes->flatMap->ligneVentes->sum('quantite')
+		];
+
+		return view('pages.clients.show', compact('client', 'clientStats'));
 	}
 
 	/**
 	 * Show the form for editing the specified client.
 	 */
-	public function edit(string $id): View
+	public function edit(Client $client): View
 	{
-		// TODO: Implement client retrieval logic
-		// $client = Client::findOrFail($id);
-
-		return view('pages.clients.edit', compact('id'));
+		return view('pages.clients.edit', compact('client'));
 	}
 
 	/**
 	 * Update the specified client in storage.
 	 */
-	public function update(Request $request, string $id)
+	public function update(Request $request, Client $client): RedirectResponse
 	{
 		$validated = $request->validate([
-			'name' => 'required|string|max:255',
-			'email' => 'required|email|unique:clients,email,' . $id,
-			'phone' => 'nullable|string|max:20',
-			'address' => 'nullable|string',
-			'company' => 'nullable|string|max:255',
-			'status' => 'required|in:active,inactive',
+			'nom' => 'required|string|max:255',
+			'email' => 'nullable|email|unique:clients,email,' . $client->id,
+			'telephone' => 'nullable|string|max:14',
 		]);
 
-		// TODO: Implement client update logic
-		// $client = Client::findOrFail($id);
-		// $client->update($validated);
+		$client->update($validated);
 
 		return redirect()->route('clients.index')
 			->with('success', 'Client mis à jour avec succès.');
@@ -101,11 +96,15 @@ class ClientController extends Controller
 	/**
 	 * Remove the specified client from storage.
 	 */
-	public function destroy(string $id)
+	public function destroy(Client $client): RedirectResponse
 	{
-		// TODO: Implement client deletion logic
-		// $client = Client::findOrFail($id);
-		// $client->delete();
+		// Vérifier si le client a des ventes associées
+		if ($client->ventes()->count() > 0) {
+			return redirect()->route('clients.index')
+				->with('error', 'Impossible de supprimer ce client car il a des ventes associées.');
+		}
+
+		$client->delete();
 
 		return redirect()->route('clients.index')
 			->with('success', 'Client supprimé avec succès.');

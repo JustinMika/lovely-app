@@ -8,6 +8,7 @@ use App\Models\Ville;
 use App\Models\Approvisionnement;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class LotController extends Controller
@@ -51,7 +52,7 @@ class LotController extends Controller
 	/**
 	 * Store a newly created lot in storage.
 	 */
-	public function store(Request $request)
+	public function store(Request $request): RedirectResponse
 	{
 		$validated = $request->validate([
 			'approvisionnement_id' => 'required|exists:approvisionnements,id',
@@ -77,9 +78,9 @@ class LotController extends Controller
 	/**
 	 * Display the specified lot.
 	 */
-	public function show(string $id): View
+	public function show(Lot $lot): View
 	{
-		$lot = Lot::with(['article', 'ville', 'approvisionnement', 'ligneVentes'])->findOrFail($id);
+		$lot->load(['article', 'ville', 'approvisionnement', 'ligneVentes']);
 
 		return view('pages.stock.show-lot', compact('lot'));
 	}
@@ -87,9 +88,8 @@ class LotController extends Controller
 	/**
 	 * Show the form for editing the specified lot.
 	 */
-	public function edit(string $id): View
+	public function edit(Lot $lot): View
 	{
-		$lot = Lot::findOrFail($id);
 		$articles = Article::where('actif', true)->orderBy('designation')->get();
 		$villes = Ville::orderBy('nom')->get();
 		$approvisionnements = Approvisionnement::orderBy('date', 'desc')->get();
@@ -100,15 +100,13 @@ class LotController extends Controller
 	/**
 	 * Update the specified lot in storage.
 	 */
-	public function update(Request $request, string $id)
+	public function update(Request $request, Lot $lot): RedirectResponse
 	{
-		$lot = Lot::findOrFail($id);
-
 		$validated = $request->validate([
 			'approvisionnement_id' => 'required|exists:approvisionnements,id',
 			'article_id' => 'required|exists:articles,id',
 			'ville_id' => 'required|exists:villes,id',
-			'numero_lot' => 'required|string|max:255|unique:lots,numero_lot,' . $id,
+			'numero_lot' => 'required|string|max:255|unique:lots,numero_lot,' . $lot->id,
 			'quantite_initiale' => 'required|integer|min:1',
 			'seuil_alerte' => 'required|integer|min:0',
 			'prix_achat' => 'required|numeric|min:0',
@@ -126,10 +124,8 @@ class LotController extends Controller
 	/**
 	 * Remove the specified lot from storage.
 	 */
-	public function destroy(string $id)
+	public function destroy(Lot $lot): RedirectResponse
 	{
-		$lot = Lot::findOrFail($id);
-
 		// Vérifier s'il y a des ventes associées
 		if ($lot->ligneVentes()->count() > 0) {
 			return redirect()->route('lots.index')

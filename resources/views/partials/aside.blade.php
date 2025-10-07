@@ -510,7 +510,7 @@
                                         Paramètres généraux
                                     </a>
                                 </li>
-                                <li>
+                                <li class="hidden">
                                     <a href="{{ route('settings.billing') }}" class="menu-dropdown-item group"
                                         :class="page === 'billingSettings' ? 'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
@@ -521,7 +521,7 @@
                                     <a href="{{ route('settings.cities') }}" class="menu-dropdown-item group"
                                         :class="page === 'citiesSettings' ? 'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
-                                        Villes & Taxes
+                                        Villes
                                     </a>
                                 </li>
                             </ul>

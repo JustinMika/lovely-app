@@ -15,6 +15,118 @@ use Carbon\Carbon;
 
 class GlobalReportController extends Controller
 {
+	/**
+	 * Afficher le rapport des ventes
+	 */
+	public function sales()
+	{
+		// Données pour les graphiques
+		$salesData = $this->getSalesChartData();
+		$topProductsData = $this->getTopProductsData();
+		$monthlyData = $this->getMonthlySalesData();
+
+		return view('pages.reports.sales', compact('salesData', 'topProductsData', 'monthlyData'));
+	}
+
+	/**
+	 * Données pour le graphique d'évolution des ventes (12 derniers mois)
+	 */
+	private function getSalesChartData()
+	{
+		$salesByMonth = Vente::selectRaw('
+			YEAR(created_at) as year,
+			MONTH(created_at) as month,
+			SUM(total) as total_sales,
+			COUNT(*) as sales_count
+		')
+			->where('created_at', '>=', Carbon::now()->subMonths(12))
+			->groupBy('year', 'month')
+			->orderBy('year')
+			->orderBy('month')
+			->get();
+
+		$labels = [];
+		$data = [];
+
+		// Générer les 12 derniers mois
+		for ($i = 11; $i >= 0; $i--) {
+			$date = Carbon::now()->subMonths($i);
+			$monthKey = $date->year . '-' . $date->month;
+
+			$labels[] = $date->format('M Y');
+
+			$monthData = $salesByMonth->first(function ($item) use ($date) {
+				return $item->year == $date->year && $item->month == $date->month;
+			});
+
+			$data[] = $monthData ? (float) $monthData->total_sales : 0;
+		}
+
+		return [
+			'labels' => $labels,
+			'data' => $data
+		];
+	}
+
+	/**
+	 * Données pour le graphique des top produits
+	 */
+	private function getTopProductsData()
+	{
+		$topProducts = DB::table('ligne_ventes')
+			->join('ventes', 'ligne_ventes.vente_id', '=', 'ventes.id')
+			->join('articles', 'ligne_ventes.article_id', '=', 'articles.id')
+			->where('ventes.created_at', '>=', Carbon::now()->subMonths(3))
+			->groupBy('articles.id', 'articles.designation')
+			->selectRaw('
+				articles.designation,
+				SUM(ligne_ventes.quantite) as quantite_vendue
+			')
+			->orderByDesc('quantite_vendue')
+			->limit(5)
+			->get();
+
+		return [
+			'labels' => $topProducts->pluck('designation')->toArray(),
+			'data' => $topProducts->pluck('quantite_vendue')->toArray()
+		];
+	}
+
+	/**
+	 * Données pour le graphique des ventes mensuelles (4 dernières semaines)
+	 */
+	private function getMonthlySalesData()
+	{
+		$weeklySales = Vente::selectRaw('
+			WEEK(created_at) as week,
+			COUNT(*) as sales_count
+		')
+			->where('created_at', '>=', Carbon::now()->subWeeks(4))
+			->groupBy('week')
+			->orderBy('week')
+			->get();
+
+		$labels = [];
+		$data = [];
+
+		// Générer les 4 dernières semaines
+		for ($i = 3; $i >= 0; $i--) {
+			$weekStart = Carbon::now()->subWeeks($i)->startOfWeek();
+			$labels[] = 'Sem ' . $weekStart->weekOfYear;
+
+			$weekData = $weeklySales->first(function ($item) use ($weekStart) {
+				return $item->week == $weekStart->weekOfYear;
+			});
+
+			$data[] = $weekData ? (int) $weekData->sales_count : 0;
+		}
+
+		return [
+			'labels' => $labels,
+			'data' => $data
+		];
+	}
+
 	public function exportGlobal(Request $request)
 	{
 		$dateRange = $request->get('dateRange', 30);

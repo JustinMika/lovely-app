@@ -52,7 +52,7 @@
                 <!-- Approvisionnement -->
                 <div>
                     <label for="approvisionnement_id" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Approvisionnement <span class="text-red-500">*</span>
+                        Approvisionnement <span class="text-error-500">*</span>
                     </label>
                     <select name="approvisionnement_id" id="approvisionnement_id" required
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
@@ -64,14 +64,14 @@
                         @endforeach
                     </select>
                     @error('approvisionnement_id')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Article -->
                 <div>
                     <label for="article_id" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Article <span class="text-red-500">*</span>
+                        Article <span class="text-error-500">*</span>
                     </label>
                     <select name="article_id" id="article_id" required
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
@@ -83,14 +83,14 @@
                         @endforeach
                     </select>
                     @error('article_id')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Ville -->
                 <div>
                     <label for="ville_id" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Ville <span class="text-red-500">*</span>
+                        Ville <span class="text-error-500">*</span>
                     </label>
                     <select name="ville_id" id="ville_id" required
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
@@ -102,90 +102,90 @@
                         @endforeach
                     </select>
                     @error('ville_id')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Numéro de Lot -->
                 <div>
                     <label for="numero_lot" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Numéro de Lot <span class="text-red-500">*</span>
+                        Numéro de Lot <span class="text-error-500">*</span>
                     </label>
                     <input type="text" name="numero_lot" id="numero_lot" required
                         value="{{ old('numero_lot', $lot->numero_lot) }}"
                         placeholder="Ex: LOT-2024-001"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('numero_lot')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Quantité Initiale -->
                 <div>
                     <label for="quantite_initiale" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Quantité Initiale <span class="text-red-500">*</span>
+                        Quantité Initiale <span class="text-error-500">*</span>
                     </label>
                     <input type="number" name="quantite_initiale" id="quantite_initiale" required min="1"
                         value="{{ old('quantite_initiale', $lot->quantite_initiale) }}"
                         placeholder="Ex: 100"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('quantite_initiale')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Prix d'Achat -->
                 <div>
                     <label for="prix_achat" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Prix d'Achat Unitaire (FCFA) <span class="text-red-500">*</span>
+                        Prix d'Achat Unitaire (FCFA) <span class="text-error-500">*</span>
                     </label>
                     <input type="number" name="prix_achat" id="prix_achat" required min="0" step="0.01"
                         value="{{ old('prix_achat', $lot->prix_achat) }}"
                         placeholder="Ex: 1500"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('prix_achat')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Prix de Vente -->
                 <div>
                     <label for="prix_vente" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Prix de Vente Unitaire (FCFA) <span class="text-red-500">*</span>
+                        Prix de Vente Unitaire (FCFA) <span class="text-error-500">*</span>
                     </label>
                     <input type="number" name="prix_vente" id="prix_vente" required min="0" step="0.01"
                         value="{{ old('prix_vente', $lot->prix_vente) }}"
                         placeholder="Ex: 2000"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('prix_vente')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Seuil d'Alerte -->
                 <div>
                     <label for="seuil_alerte" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Seuil d'Alerte <span class="text-red-500">*</span>
+                        Seuil d'Alerte <span class="text-error-500">*</span>
                     </label>
                     <input type="number" name="seuil_alerte" id="seuil_alerte" required min="0"
                         value="{{ old('seuil_alerte', $lot->seuil_alerte ?? 10) }}"
                         placeholder="Ex: 10"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('seuil_alerte')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Date d'Arrivée -->
                 <div>
                     <label for="date_arrivee" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Date d'Arrivée <span class="text-red-500">*</span>
+                        Date d'Arrivée <span class="text-error-500">*</span>
                     </label>
                     <input type="date" name="date_arrivee" id="date_arrivee" required
                         value="{{ old('date_arrivee', $lot->date_arrivee->format('Y-m-d')) }}"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('date_arrivee')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -198,7 +198,7 @@
                         value="{{ old('date_expiration', $lot->date_expiration?->format('Y-m-d')) }}"
                         class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     @error('date_expiration')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                     @enderror
                 </div>
             </div>

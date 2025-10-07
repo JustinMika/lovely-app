@@ -12,19 +12,10 @@ use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Group;
 
-class SalesManager extends Component implements HasForms
+class SalesManager extends Component
 {
-	use WithPagination, InteractsWithForms;
+	use WithPagination;
 
 	// View modes
 	public $currentView = 'list'; // 'list', 'create', 'edit'
@@ -45,8 +36,10 @@ class SalesManager extends Component implements HasForms
 	public $lots = [];
 	public $isEditing = false;
 
-	// Filament Forms data
-	public ?array $data = [];
+	// Add article form properties
+	public $selectedLotId = null;
+	public $selectedQuantity = 1;
+	public $selectedRemise = 0;
 
 	// Search properties
 	public $clientOptions = [];
@@ -87,21 +80,15 @@ class SalesManager extends Component implements HasForms
 
 	public function mount($view = 'list', $saleId = null)
 	{
+		$this->currentView = $view;
+
 		$this->loadFormData();
 		$this->loadClientOptions();
 		$this->loadLotOptions();
 
 		if ($this->currentView === 'create') {
-			$this->addItem();
+			$this->resetForm();
 		}
-
-		// Initialize Filament form data
-		$this->data = [
-			'clientId' => $this->clientId,
-			'items' => $this->items,
-			'remiseTotale' => $this->remiseTotale,
-			'montantPaye' => $this->montantPaye,
-		];
 	}
 
 	public function switchToCreate()
@@ -152,35 +139,16 @@ class SalesManager extends Component implements HasForms
 	{
 		$this->clients = Client::all();
 		$this->lots = Lot::with('article')->where('quantite_restante', '>', 0)->get();
-		$this->loadClientOptions();
-		$this->loadLotOptions();
 	}
 
 	public function loadClientOptions()
 	{
-		$this->clientOptions = Client::all()
-			->mapWithKeys(function ($client) {
-				return [
-					$client->id => "{$client->nom} {$client->prenom}" .
-						($client->telephone ? " - {$client->telephone}" : '')
-				];
-			})
-			->toArray();
+		$this->clients = Client::all();
 	}
 
 	public function loadLotOptions()
 	{
-		$this->lotOptions = Lot::with('article')
-			->where('quantite_restante', '>', 0)
-			->get()
-			->mapWithKeys(function ($lot) {
-				return [
-					$lot->id => "{$lot->article->designation} - {$lot->numero_lot} " .
-						"({$lot->quantite_restante} en stock - " .
-						number_format($lot->prix_vente, 0, ',', ' ') . " FCFA)"
-				];
-			})
-			->toArray();
+		$this->lots = Lot::with('article')->where('quantite_restante', '>', 0)->get();
 	}
 
 	public function searchClients($search)
@@ -241,6 +209,7 @@ class SalesManager extends Component implements HasForms
 		foreach ($sale->ligneVentes as $ligne) {
 			$this->items[] = [
 				'lot_id' => $ligne->lot_id,
+				'article_designation' => $ligne->lot->article->designation,
 				'quantite' => $ligne->quantite,
 				'prix_unitaire' => $ligne->prix_unitaire,
 				'remise_ligne' => $ligne->remise_ligne,
@@ -248,15 +217,6 @@ class SalesManager extends Component implements HasForms
 		}
 	}
 
-	public function addItem()
-	{
-		$this->items[] = [
-			'lot_id' => '',
-			'quantite' => 1,
-			'prix_unitaire' => 0,
-			'remise_ligne' => 0,
-		];
-	}
 
 	public function removeItem($index)
 	{
@@ -302,8 +262,15 @@ class SalesManager extends Component implements HasForms
 			'adresse' => ''
 		];
 
+		$this->loadClientOptions();
+
+		$clientsForChoices = Client::all()->map(function ($client) {
+			return ['value' => $client->id, 'label' => $client->nom . ' ' . $client->prenom];
+		});
+
 		$this->dispatch('client-created', [
-			'message' => 'Client créé avec succès'
+			'message' => 'Client créé avec succès',
+			'clients' => $clientsForChoices->toJson()
 		]);
 	}
 
@@ -339,13 +306,50 @@ class SalesManager extends Component implements HasForms
 		return max(0, $sousTotal);
 	}
 
+	public function addArticleToCart()
+	{
+		$this->validate([
+			'selectedLotId' => 'required|exists:lots,id',
+			'selectedQuantity' => 'required|integer|min:1',
+			'selectedRemise' => 'nullable|numeric|min:0|max:100',
+		]);
+
+		$lot = Lot::with('article')->find($this->selectedLotId);
+
+		if ($lot->quantite_restante < $this->selectedQuantity) {
+			$this->dispatch('show-error', ['message' => 'Stock insuffisant. Disponible: ' . $lot->quantite_restante]);
+			return;
+		}
+
+		$existingItemIndex = null;
+		foreach ($this->items as $index => $item) {
+			if ($item['lot_id'] == $this->selectedLotId) {
+				$existingItemIndex = $index;
+				break;
+			}
+		}
+
+		if ($existingItemIndex !== null) {
+			$this->items[$existingItemIndex]['quantite'] += $this->selectedQuantity;
+		} else {
+			$this->items[] = [
+				'lot_id' => $lot->id,
+				'article_designation' => $lot->article->designation,
+				'quantite' => $this->selectedQuantity,
+				'prix_unitaire' => $lot->prix_vente,
+				'remise_ligne' => $this->selectedRemise,
+			];
+		}
+
+		// Reset form
+		$this->selectedLotId = null;
+		$this->selectedQuantity = 1;
+		$this->selectedRemise = 0;
+		$this->dispatch('article-added');
+	}
+
 	public function saveSale()
 	{
-		// Sync Filament form data with component properties
-		$this->clientId = $this->data['clientId'] ?? '';
-		$this->items = $this->data['items'] ?? [];
-		$this->remiseTotale = $this->data['remiseTotale'] ?? 0;
-		$this->montantPaye = $this->data['montantPaye'] ?? 0;
 
 		$this->validate();
 
@@ -468,146 +472,6 @@ class SalesManager extends Component implements HasForms
 		}
 	}
 
-	public function form(Form $form): Form
-	{
-		return $form
-			->schema([
-				Grid::make(2)
-					->schema([
-						// Section Client avec TailwindCSS
-						Section::make('Client')
-							->schema([
-								Grid::make(1)
-									->schema([
-										Group::make()
-											->schema([
-												TextInput::make('client_search')
-													->label('Rechercher un client')
-													->placeholder('Tapez le nom, prénom ou téléphone...')
-													->live(debounce: 300)
-													->afterStateUpdated(function ($state) {
-														$this->searchClients($state);
-													})
-													->extraAttributes([
-														'class' => 'dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30'
-													]),
-
-												Select::make('clientId')
-													->label('Sélectionner le client')
-													->options($this->clientOptions ?? [])
-													->placeholder('Choisissez un client...')
-													->required()
-													->live()
-													->afterStateUpdated(function ($state) {
-														$this->clientId = $state;
-													})
-													->extraAttributes([
-														'class' => 'dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30'
-													]),
-											])
-									])
-							])
-							->columnSpan(1),
-
-						// Section Articles
-						Section::make('Articles')
-							->schema([
-								Repeater::make('items')
-									->schema([
-										Grid::make(6)
-											->schema([
-												Group::make()
-													->schema([
-														TextInput::make('lot_search')
-															->label('Rechercher un lot')
-															->placeholder('Tapez le nom de l\'article ou numéro de lot...')
-															->live(debounce: 300)
-															->afterStateUpdated(function ($state) {
-																$this->searchLots($state);
-															})
-															->extraAttributes([
-																'class' => 'dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30'
-															]),
-
-														Select::make('lot_id')
-															->label('Sélectionner le lot')
-															->options($this->lotOptions ?? [])
-															->placeholder('Choisissez un lot...')
-															->live()
-															->afterStateUpdated(function ($state, $set) {
-																if ($state) {
-																	$lot = Lot::find($state);
-																	if ($lot) {
-																		$set('prix_unitaire', $lot->prix_vente);
-																	}
-																}
-															})
-															->extraAttributes([
-																'class' => 'dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30'
-															]),
-													])
-													->columnSpan(2),
-
-												TextInput::make('quantite')
-													->label('Quantité')
-													->numeric()
-													->minValue(1)
-													->required()
-													->live()
-													->columnSpan(1),
-
-												TextInput::make('prix_unitaire')
-													->label('Prix unitaire')
-													->numeric()
-													->minValue(0)
-													->required()
-													->live()
-													->columnSpan(1),
-
-												TextInput::make('remise_ligne')
-													->label('Remise ligne')
-													->numeric()
-													->minValue(0)
-													->default(0)
-													->live()
-													->columnSpan(1),
-											])
-									])
-									->addActionLabel('Ajouter un article')
-									->defaultItems(1)
-									->minItems(1)
-									->collapsible()
-									->itemLabel(function (array $state): ?string {
-										if (isset($state['lot_id'])) {
-											$lot = Lot::with('article')->find($state['lot_id']);
-											return $lot?->article?->nom ?? 'Article inconnu';
-										}
-										return 'Nouvel article';
-									}),
-							])
-							->columnSpan(1),
-					]),
-
-				// Section Totaux
-				Grid::make(3)
-					->schema([
-						TextInput::make('remiseTotale')
-							->label('Remise totale')
-							->numeric()
-							->minValue(0)
-							->default(0)
-							->live(),
-
-						TextInput::make('montantPaye')
-							->label('Montant payé')
-							->numeric()
-							->minValue(0)
-							->required()
-							->live(),
-					])
-			])
-			->statePath('data');
-	}
 
 	public function getMetrics()
 	{
@@ -639,6 +503,9 @@ class SalesManager extends Component implements HasForms
 			return view('livewire.sales-manager', compact('sales', 'metrics'));
 		}
 
-		return view('livewire.sales-manager');
+		return view('livewire.sales-manager', [
+			'clients' => $this->clients,
+			'lots' => $this->lots
+		]);
 	}
 }

@@ -16,7 +16,7 @@
                     <li class="text-gray-400 dark:text-gray-600">/</li>
                     <li>
                         <a class="font-medium text-gray-600 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-400"
-                            href="{{ route('stock.index') }}">Stock</a>
+                            href="{{ route('lots.index') }}">Lots</a>
                     </li>
                     <li class="text-gray-400 dark:text-gray-600">/</li>
                     <li class="font-medium text-brand-500 dark:text-brand-400">Créer un Lot</li>
@@ -46,7 +46,7 @@
                         <div>
                             <label for="article_id"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Article <span class="text-red-500">*</span>
+                                Article <span class="text-error-500">*</span>
                             </label>
                             <select id="article_id" name="article_id" required
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
@@ -59,14 +59,14 @@
                                 @endforeach
                             </select>
                             @error('article_id')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Ville -->
                         <div>
                             <label for="ville_id" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Ville <span class="text-red-500">*</span>
+                                Ville <span class="text-error-500">*</span>
                             </label>
                             <select id="ville_id" name="ville_id" required
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
@@ -79,7 +79,7 @@
                                 @endforeach
                             </select>
                             @error('ville_id')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -87,14 +87,14 @@
                         <div>
                             <label for="numero_lot"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Numéro de Lot <span class="text-red-500">*</span>
+                                Numéro de Lot <span class="text-error-500">*</span>
                             </label>
                             <input type="text" id="numero_lot" name="numero_lot" value="{{ old('numero_lot') }}"
                                 required
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                                 placeholder="Ex: LOT-2024-001">
                             @error('numero_lot')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -102,14 +102,14 @@
                         <div>
                             <label for="quantite_initiale"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Quantité Initiale <span class="text-red-500">*</span>
+                                Quantité Initiale <span class="text-error-500">*</span>
                             </label>
                             <input type="number" id="quantite_initiale" name="quantite_initiale"
                                 value="{{ old('quantite_initiale') }}" required min="1"
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                                 placeholder="Ex: 100">
                             @error('quantite_initiale')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -117,14 +117,14 @@
                         <div>
                             <label for="prix_achat"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Prix d'Achat <span class="text-red-500">*</span>
+                                Prix d'Achat <span class="text-error-500">*</span>
                             </label>
                             <input type="number" id="prix_achat" name="prix_achat" value="{{ old('prix_achat') }}"
                                 required min="0" step="0.01"
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                                 placeholder="Ex: 15.50">
                             @error('prix_achat')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -132,14 +132,14 @@
                         <div>
                             <label for="prix_vente"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Prix de Vente <span class="text-red-500">*</span>
+                                Prix de Vente <span class="text-error-500">*</span>
                             </label>
                             <input type="number" id="prix_vente" name="prix_vente" value="{{ old('prix_vente') }}"
                                 required min="0" step="0.01"
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                                 placeholder="Ex: 25.00">
                             @error('prix_vente')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -147,14 +147,14 @@
                         <div>
                             <label for="seuil_alerte"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Seuil d'Alerte <span class="text-red-500">*</span>
+                                Seuil d'Alerte <span class="text-error-500">*</span>
                             </label>
                             <input type="number" id="seuil_alerte" name="seuil_alerte"
                                 value="{{ old('seuil_alerte', 10) }}" required min="0"
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
                                 placeholder="Ex: 10">
                             @error('seuil_alerte')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -162,13 +162,13 @@
                         <div>
                             <label for="date_arrivee"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Date d'Arrivée <span class="text-red-500">*</span>
+                                Date d'Arrivée <span class="text-error-500">*</span>
                             </label>
                             <input type="date" id="date_arrivee" name="date_arrivee"
                                 value="{{ old('date_arrivee', date('Y-m-d')) }}" required
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                             @error('date_arrivee')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -182,7 +182,7 @@
                                 value="{{ old('date_expiration') }}"
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                             @error('date_expiration')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -190,11 +190,11 @@
                         <div>
                             <label for="approvisionnement_id"
                                 class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                Approvisionnement (optionnel)
+                                Approvisionnement <span class="text-error-500">*</span>
                             </label>
-                            <select id="approvisionnement_id" name="approvisionnement_id"
+                            <select id="approvisionnement_id" name="approvisionnement_id" required
                                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
-                                <option value="">Aucun approvisionnement</option>
+                                <option value="">Sélectionner un approvisionnement</option>
                                 @foreach (\App\Models\Approvisionnement::orderBy('created_at', 'desc')->limit(20)->get() as $appro)
                                     <option value="{{ $appro->id }}"
                                         {{ old('approvisionnement_id') == $appro->id ? 'selected' : '' }}>
@@ -203,14 +203,14 @@
                                 @endforeach
                             </select>
                             @error('approvisionnement_id')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-theme-xs text-error-500">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-6 dark:border-gray-800">
-                        <a href="{{ route('stock.index') }}"
+                        <a href="{{ route('lots.index') }}"
                             class="shadow-theme-xs inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-sm font-medium text-gray-700 ring-1 ring-gray-300 transition hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:bg-white/[0.03]">
                             Annuler
                         </a>

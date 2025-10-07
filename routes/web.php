@@ -100,9 +100,7 @@ Route::middleware(['auth'])->group(function () {
 
 	// Rapports - Admin/Gérant only
 	Route::prefix('reports')->name('reports.')->middleware(['role:Admin,Gérant'])->group(function () {
-		Route::get('/sales', function () {
-			return view('pages.reports.sales');
-		})->name('sales');
+		Route::get('/sales', [App\Http\Controllers\GlobalReportController::class, 'sales'])->name('sales');
 		Route::get('/financial', function () {
 			return view('pages.reports.financial');
 		})->name('financial');

@@ -4,7 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Ville;
 use Illuminate\Database\Eloquent\Builder;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Illuminate\Support\Facades\Log;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -34,12 +35,7 @@ class VilleManager extends Component
 	protected function rules()
 	{
 		return [
-			'nom' => [
-				'required',
-				'string',
-				'max:255',
-				'unique:villes,nom,' . $this->villeId,
-			],
+			'nom' => 'required|string|max:255|unique:villes,nom,' . $this->villeId,
 		];
 	}
 
@@ -53,6 +49,13 @@ class VilleManager extends Component
 	public function mount()
 	{
 		$this->resetForm();
+	}
+
+	public function render()
+	{
+		return view('livewire.ville-manager', [
+			'villes' => $this->getVilles(),
+		]);
 	}
 
 	public function updatedSearch()
@@ -76,11 +79,17 @@ class VilleManager extends Component
 		$this->resetPage();
 	}
 
+	public function testLivewire()
+	{
+		Log::info('VilleManager::testLivewire() appelée - TEST RÉUSSI !');
+		$this->alert('success', 'Livewire fonctionne ! 🎉');
+	}
+
 	public function openModal()
 	{
-		$this->resetForm();
 		$this->showModal = true;
 		$this->editMode = false;
+		$this->resetForm();
 	}
 
 	public function closeModal()
@@ -94,10 +103,14 @@ class VilleManager extends Component
 	{
 		$this->villeId = null;
 		$this->nom = '';
+		// $this->showModal = true;
 	}
 
 	public function save()
 	{
+		Log::info('VilleManager::save() appelée - Début de la sauvegarde');
+		Log::info('Données reçues: nom=' . $this->nom . ', editMode=' . ($this->editMode ? 'true' : 'false'));
+
 		$this->validate();
 
 		try {
@@ -107,30 +120,44 @@ class VilleManager extends Component
 					'nom' => $this->nom,
 				]);
 
-				$this->alert('success', 'Ville modifiée avec succès!');
+				LivewireAlert::title('Succès!')
+					->text('Ville modifiée avec succès!')
+					->success()
+					->show();
 			} else {
 				Ville::create([
 					'nom' => $this->nom,
 				]);
 
-				$this->alert('success', 'Nouvelle ville créée avec succès!');
+				LivewireAlert::title('Succès!')
+					->text('Nouvelle ville créée avec succès!')
+					->success()
+					->show();
 			}
 
 			$this->closeModal();
+			$this->dispatch('close-modal');
 		} catch (\Exception $e) {
-			$this->alert('error', 'Une erreur est survenue lors de la sauvegarde.');
+			LivewireAlert::title('Erreur!')
+				->text('Une erreur est survenue lors de la sauvegarde: ' . $e->getMessage())
+				->error()
+				->show();
 		}
 	}
 
 	public function edit($villeId)
 	{
+		Log::info('VilleManager::edit() appelée avec villeId: ' . $villeId);
+
 		$ville = Ville::findOrFail($villeId);
+		Log::info('Ville trouvée: ' . $ville->nom . ' (ID: ' . $ville->id . ')');
 
 		$this->villeId = $ville->id;
 		$this->nom = $ville->nom;
 
 		$this->editMode = true;
-		$this->showModal = true;
+
+		Log::info('Données chargées: villeId=' . $this->villeId . ', nom=' . $this->nom . ', editMode=' . ($this->editMode ? 'true' : 'false'));
 	}
 
 	public function showDetail($villeId)
@@ -147,11 +174,11 @@ class VilleManager extends Component
 		$this->selectedVille = null;
 	}
 
-	#[On('confirmDelete')]
-	public function delete($villeId)
+	#[On('delete')]
+	public function delete($data)
 	{
 		try {
-			$ville = Ville::findOrFail($villeId);
+			$ville = Ville::findOrFail($data['villeId']);
 
 			// Vérifier s'il y a des lots associés
 			if ($ville->lots()->count() > 0) {
@@ -168,17 +195,21 @@ class VilleManager extends Component
 
 	public function confirmDelete($villeId)
 	{
-		$this->confirm('Êtes-vous sûr de vouloir supprimer cette ville?', [
+		$this->dispatch('swal:confirm', [
+			'title' => 'Confirmation',
+			'text' => 'Êtes-vous sûr de vouloir supprimer cette ville?',
+			'icon' => 'warning',
 			'confirmButtonText' => 'Oui, supprimer',
 			'cancelButtonText' => 'Annuler',
-			'onConfirmed' => 'confirmDelete',
-			'data' => ['villeId' => $villeId]
+			'method' => 'delete',
+			'params' => ['villeId' => $villeId]
 		]);
 	}
 
 	public function exportPdf()
 	{
-		return redirect()->route('villes.export.pdf', [
+		// dd("d;lfkd;lf");
+		return redirect()->route('cities.export.pdf', [
 			'search' => $this->search,
 			'sortField' => $this->sortField,
 			'sortDirection' => $this->sortDirection,
@@ -193,12 +224,5 @@ class VilleManager extends Component
 			})
 			->orderBy($this->sortField, $this->sortDirection)
 			->paginate($this->perPage);
-	}
-
-	public function render()
-	{
-		return view('livewire.ville-manager', [
-			'villes' => $this->getVilles(),
-		]);
 	}
 }

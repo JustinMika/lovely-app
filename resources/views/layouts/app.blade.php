@@ -32,8 +32,8 @@ $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(valu
             </main>
         </div>
     </div>
-    @includeIf('partials.admin-footer-js')
     @livewireScripts
+    @includeIf('partials.admin-footer-js')
 </body>
 
 </html>
