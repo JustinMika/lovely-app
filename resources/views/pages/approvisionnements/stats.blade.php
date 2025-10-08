@@ -66,12 +66,12 @@
                         </td>
                         <td class="py-4">
                             <div class="text-sm font-medium text-gray-800 dark:text-white/90">
-                                €{{ number_format($value, 2) }}
+                                {{ currency($value, 2) }}
                             </div>
                         </td>
                         <td class="py-4">
                             <div class="text-sm text-gray-800 dark:text-white/90">
-                                €{{ number_format($average, 2) }}
+                                {{ currency($average, 2) }}
                             </div>
                         </td>
                     </tr>
@@ -134,12 +134,12 @@
                     </td>
                     <td class="py-4">
                         <div class="text-sm font-medium text-gray-800 dark:text-white/90">
-                            €{{ number_format($supplier->total_value, 2) }}
+                            {{ currency($supplier->total_value, 2) }}
                         </div>
                     </td>
                     <td class="py-4">
                         <div class="text-sm text-gray-800 dark:text-white/90">
-                            €{{ number_format($supplier->total_value / $supplier->count, 2) }}
+                            {{ currency($supplier->total_value / $supplier->count, 2) }}
                         </div>
                     </td>
                 </tr>
@@ -207,7 +207,7 @@
                     </td>
                     <td class="py-4">
                         <div class="text-sm font-medium text-gray-800 dark:text-white/90">
-                            €{{ number_format($approvisionnement->lots->sum(function($lot) { return $lot->quantite_initiale * $lot->prix_achat; }), 2) }}
+                            {{ currency($approvisionnement->lots->sum(function($lot) { return $lot->quantite_initiale * $lot->prix_achat; }), 2) }}
                         </div>
                     </td>
                     <td class="py-4 text-right">

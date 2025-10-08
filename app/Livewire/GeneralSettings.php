@@ -81,7 +81,7 @@ class GeneralSettings extends Component
 		$this->company_email = Setting::get('company_email', '');
 		$this->current_logo = Setting::get('app_logo');
 
-		$this->currency_symbol = Setting::get('currency_symbol', 'FCFA');
+		$this->currency_symbol = Setting::get('currency_symbol', 'FC');
 		$this->currency_position = Setting::get('currency_position', 'after');
 
 		$this->low_stock_threshold = Setting::get('low_stock_threshold', 10);

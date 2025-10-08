@@ -62,7 +62,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Valeur Totale</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($metrics['total_value'], 0, ',', ' ') }} FCFA</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ currency($metrics['total_value']) }}</p>
                 </div>
                 <div class="rounded-lg bg-green-50 p-3 dark:bg-green-500/10">
                     <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ number_format($lot->prix_vente, 0, ',', ' ') }} FCFA
+                                    {{ currency($lot->prix_vente) }}
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ $lot->date_arrivee->format('d/m/Y') }}

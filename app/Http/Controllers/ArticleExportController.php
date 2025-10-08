@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Models\AppSetting;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -55,6 +56,10 @@ class ArticleExportController extends Controller
             'quantite_totale_stock' => $quantiteTotaleStock,
         ];
 
+        // Récupérer le symbole de devise
+        $settings = AppSetting::getInstance();
+        $currencySymbol = $settings->currency_symbol ?? 'USD';
+        
         // Créer le PDF avec FPDF
         $pdf = new \FPDF();
         $pdf->AddPage();
@@ -79,7 +84,7 @@ class ArticleExportController extends Controller
         $pdf->Cell(50, 6, 'Avec stock:', 0, 0);
         $pdf->Cell(40, 6, number_format($stats['articles_avec_stock']), 0, 1);
         $pdf->Cell(50, 6, 'Valeur stock totale:', 0, 0);
-        $pdf->Cell(40, 6, number_format($stats['valeur_totale_stock'], 0, ',', ' ') . ' FCFA', 0, 1);
+        $pdf->Cell(40, 6, number_format($stats['valeur_totale_stock'], 0, ',', ' ') . ' ' . $currencySymbol, 0, 1);
         $pdf->Cell(50, 6, 'Quantite totale:', 0, 0);
         $pdf->Cell(40, 6, number_format($stats['quantite_totale_stock']), 0, 1);
         $pdf->Ln(10);

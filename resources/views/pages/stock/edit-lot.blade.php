@@ -137,7 +137,7 @@
                 <!-- Prix d'Achat -->
                 <div>
                     <label for="prix_achat" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Prix d'Achat Unitaire (FCFA) <span class="text-error-500">*</span>
+                        Prix d'Achat Unitaire ({{ app_setting('currency_symbol', 'FC') }}) <span class="text-error-500">*</span>
                     </label>
                     <input type="number" name="prix_achat" id="prix_achat" required min="0" step="0.01"
                         value="{{ old('prix_achat', $lot->prix_achat) }}"
@@ -151,7 +151,7 @@
                 <!-- Prix de Vente -->
                 <div>
                     <label for="prix_vente" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Prix de Vente Unitaire (FCFA) <span class="text-error-500">*</span>
+                        Prix de Vente Unitaire ({{ app_setting('currency_symbol', 'FC') }}) <span class="text-error-500">*</span>
                     </label>
                     <input type="number" name="prix_vente" id="prix_vente" required min="0" step="0.01"
                         value="{{ old('prix_vente', $lot->prix_vente) }}"
@@ -259,7 +259,7 @@
                 const pourcentage = ((marge / achat) * 100).toFixed(1);
                 
                 // You can add margin display logic here if needed
-                console.log(`Marge: ${marge} FCFA (${pourcentage}%)`);
+                console.log(`Marge: ${marge} {{ app_setting('currency_symbol', 'FC') }} (${pourcentage}%)`);
             }
         }
         

@@ -95,7 +95,7 @@
         <div class="flex items-end justify-between">
             <div>
                 <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-                    €{{ number_format($stats['total_value'], 2) }}
+                    {{ currency($stats['total_value'], 2) }}
                 </h4>
             </div>
         </div>
@@ -202,7 +202,7 @@
                     </td>
                     <td class="py-4">
                         <div class="text-sm font-medium text-gray-800 dark:text-white/90">
-                            €{{ number_format($approvisionnement->lots->sum(function($lot) { return $lot->quantite_initiale * $lot->prix_achat; }), 2) }}
+                            {{ currency($approvisionnement->lots->sum(function($lot) { return $lot->quantite_initiale * $lot->prix_achat; }), 2) }}
                         </div>
                     </td>
                     <td class="py-4 text-right">

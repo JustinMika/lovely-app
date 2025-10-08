@@ -124,7 +124,7 @@
             <div class="flex items-end justify-between">
                 <div>
                     <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">
-                        {{ number_format($metrics['total_revenue'], 0, ',', ' ') }} FCFA
+                        {{ currency($metrics['total_revenue']) }}
                     </h4>
                 </div>
                 <span

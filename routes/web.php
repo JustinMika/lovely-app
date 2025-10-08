@@ -62,7 +62,8 @@ Route::middleware(['auth'])->group(function () {
 	// Ventes - All authenticated users
 	Route::resource('sales', App\Http\Controllers\SaleController::class);
 	Route::prefix('sales')->name('sales.')->group(function () {
-		Route::get('/{id}/invoice', [App\Http\Controllers\SaleController::class, 'invoice'])->name('invoice');
+		Route::get('/{sale}/invoice', [App\Http\Controllers\SaleController::class, 'invoice'])->name('invoice');
+		Route::get('/{sale}/invoice/pdf', [App\Http\Controllers\SaleController::class, 'invoicePdf'])->name('invoice.pdf');
 		Route::get('/invoices', function () {
 			return view('pages.sales.invoices');
 		})->name('invoices');
@@ -89,11 +90,9 @@ Route::middleware(['auth'])->group(function () {
 	});
 
 	// Clients - All authenticated users
-	Route::resource('clients', App\Http\Controllers\ClientController::class);
-	Route::get('clients/history', function () {
-		return view('pages.clients.history');
-	})->name('clients.history');
+	Route::get('clients/history', [App\Http\Controllers\ClientController::class, 'history'])->name('clients.history');
 	Route::get('clients/export/pdf', [App\Http\Controllers\ClientExportController::class, 'exportPdf'])->name('clients.export.pdf');
+	Route::resource('clients', App\Http\Controllers\ClientController::class);
 
 	// Example SweetAlert2 + Livewire Demo
 	Route::get('/examples/sweetalert', [App\Http\Controllers\ExampleLivewireController::class, 'showAlert'])->name('examples.sweetalert');

@@ -40,7 +40,7 @@
             <div class="mt-4 flex items-end justify-between">
                 <div>
                     <h4 class="text-title-md font-bold text-black dark:text-white">
-                        {{ number_format($metrics['total_revenue'], 0, ',', ' ') }} FCFA
+                        {{ currency($metrics['total_revenue']) }}
                     </h4>
                     <span class="text-sm font-medium">Chiffre d'affaires</span>
                 </div>
@@ -138,7 +138,7 @@
                             <div class="flex items-center justify-center p-2.5 xl:p-5">
                                 <p class="text-meta-3">
                                     @if (isset($activity['amount']))
-                                        {{ number_format($activity['amount'], 0, ',', ' ') }} FCFA
+                                        {{ currency($activity['amount']) }}
                                     @else
                                         -
                                     @endif

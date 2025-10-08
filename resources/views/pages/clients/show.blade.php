@@ -97,7 +97,7 @@
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Dépensé</p>
                         <p class="text-2xl font-bold text-gray-800 dark:text-white">
-                            {{ number_format($clientStats['total_depense'], 0, ',', ' ') }} FCFA</p>
+                            {{ currency($clientStats['total_depense']) }}</p>
                     </div>
                     <div class="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
                         <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
@@ -187,13 +187,13 @@
                                     </td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
-                                        {{ number_format($vente->total, 0, ',', ' ') }} FCFA
+                                        {{ currency($vente->total) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                                         {{ $vente->ligneVentes->count() }} article(s)
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <a href="{{ route('sales.show', $vente) }}"
+                                        <a href="{{ route('sales.show', $vente->id) }}"
                                             class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300">
                                             Voir détails
                                         </a>

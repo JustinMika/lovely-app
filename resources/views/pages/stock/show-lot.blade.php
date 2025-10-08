@@ -136,18 +136,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Prix d'Achat Unitaire</label>
-                        <p class="text-xl font-semibold text-gray-900 dark:text-white">{{ number_format($lot->prix_achat, 0, ',', ' ') }} FCFA</p>
+                        <p class="text-xl font-semibold text-gray-900 dark:text-white">{{ currency($lot->prix_achat) }}</p>
                     </div>
 
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Prix de Vente Unitaire</label>
-                        <p class="text-xl font-semibold text-green-600 dark:text-green-400">{{ number_format($lot->prix_vente, 0, ',', ' ') }} FCFA</p>
+                        <p class="text-xl font-semibold text-green-600 dark:text-green-400">{{ currency($lot->prix_vente) }}</p>
                     </div>
 
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Marge Unitaire</label>
                         <p class="text-xl font-semibold text-blue-600 dark:text-blue-400">
-                            {{ number_format($lot->prix_vente - $lot->prix_achat, 0, ',', ' ') }} FCFA
+                            {{ currency($lot->prix_vente - $lot->prix_achat) }}
                         </p>
                     </div>
 
@@ -188,10 +188,10 @@
                                             {{ $ligne->quantite }}
                                         </td>
                                         <td class="px-4 py-3">
-                                            {{ number_format($ligne->prix_unitaire, 0, ',', ' ') }} FCFA
+                                            {{ currency($ligne->prix_unitaire) }}
                                         </td>
                                         <td class="px-4 py-3 font-medium">
-                                            {{ number_format($ligne->quantite * $ligne->prix_unitaire, 0, ',', ' ') }} FCFA
+                                            {{ currency($ligne->quantite * $ligne->prix_unitaire) }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -271,28 +271,28 @@
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-600 dark:text-gray-400">Investissement Total</span>
                         <span class="font-medium text-gray-900 dark:text-white">
-                            {{ number_format($lot->quantite_initiale * $lot->prix_achat, 0, ',', ' ') }} FCFA
+                            {{ currency($lot->quantite_initiale * $lot->prix_achat) }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-600 dark:text-gray-400">Valeur Stock Restant</span>
                         <span class="font-medium text-gray-900 dark:text-white">
-                            {{ number_format($lot->quantite_restante * $lot->prix_vente, 0, ',', ' ') }} FCFA
+                            {{ currency($lot->quantite_restante * $lot->prix_vente) }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between items-center">
                         <span class="text-sm text-gray-600 dark:text-gray-400">CA Potentiel Total</span>
                         <span class="font-medium text-green-600 dark:text-green-400">
-                            {{ number_format($lot->quantite_initiale * $lot->prix_vente, 0, ',', ' ') }} FCFA
+                            {{ currency($lot->quantite_initiale * $lot->prix_vente) }}
                         </span>
                     </div>
                     
                     <div class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
                         <span class="text-sm font-medium text-gray-900 dark:text-white">Marge Potentielle</span>
                         <span class="font-semibold text-blue-600 dark:text-blue-400">
-                            {{ number_format(($lot->prix_vente - $lot->prix_achat) * $lot->quantite_initiale, 0, ',', ' ') }} FCFA
+                            {{ currency(($lot->prix_vente - $lot->prix_achat) * $lot->quantite_initiale) }}
                         </span>
                     </div>
                 </div>

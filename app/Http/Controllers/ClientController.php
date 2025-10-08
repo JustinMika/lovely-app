@@ -109,4 +109,81 @@ class ClientController extends Controller
 		return redirect()->route('clients.index')
 			->with('success', 'Client supprimé avec succès.');
 	}
+
+	/**
+	 * Display clients history with transactions.
+	 */
+	public function history(Request $request): View
+	{
+		$search = $request->get('search', '');
+		$dateFrom = $request->get('date_from');
+		$dateTo = $request->get('date_to');
+		$perPage = $request->get('per_page', 15);
+
+		// Récupérer tous les clients avec leurs ventes
+		$query = Client::with(['ventes' => function ($query) use ($dateFrom, $dateTo) {
+			$query->with(['ligneVentes.article', 'utilisateur'])
+				->latest();
+			
+			if ($dateFrom) {
+				$query->whereDate('created_at', '>=', $dateFrom);
+			}
+			if ($dateTo) {
+				$query->whereDate('created_at', '<=', $dateTo);
+			}
+		}])
+		->withCount('ventes')
+		->withSum('ventes', 'total')
+		->withSum('ventes', 'montant_paye');
+
+		// Appliquer la recherche
+		if (!empty($search)) {
+			$query->where(function ($q) use ($search) {
+				$q->where('nom', 'like', "%{$search}%")
+					->orWhere('telephone', 'like', "%{$search}%")
+					->orWhere('email', 'like', "%{$search}%");
+			});
+		}
+
+		// Trier par clients ayant des ventes
+		$clients = $query->having('ventes_count', '>', 0)
+			->orderByDesc('ventes_sum_total')
+			->paginate($perPage);
+
+		// Calculer les statistiques globales
+		$stats = [
+			'total_transactions' => \App\Models\Vente::when($dateFrom, function ($q) use ($dateFrom) {
+					return $q->whereDate('created_at', '>=', $dateFrom);
+				})
+				->when($dateTo, function ($q) use ($dateTo) {
+					return $q->whereDate('created_at', '<=', $dateTo);
+				})
+				->count(),
+			'total_revenue' => \App\Models\Vente::when($dateFrom, function ($q) use ($dateFrom) {
+					return $q->whereDate('created_at', '>=', $dateFrom);
+				})
+				->when($dateTo, function ($q) use ($dateTo) {
+					return $q->whereDate('created_at', '<=', $dateTo);
+				})
+				->sum('total'),
+			'total_paid' => \App\Models\Vente::when($dateFrom, function ($q) use ($dateFrom) {
+					return $q->whereDate('created_at', '>=', $dateFrom);
+				})
+				->when($dateTo, function ($q) use ($dateTo) {
+					return $q->whereDate('created_at', '<=', $dateTo);
+				})
+				->sum('montant_paye'),
+			'active_clients' => Client::whereHas('ventes', function ($q) use ($dateFrom, $dateTo) {
+					if ($dateFrom) {
+						$q->whereDate('created_at', '>=', $dateFrom);
+					}
+					if ($dateTo) {
+						$q->whereDate('created_at', '<=', $dateTo);
+					}
+				})
+				->count(),
+		];
+
+		return view('pages.clients.history', compact('clients', 'stats', 'search', 'dateFrom', 'dateTo', 'perPage'));
+	}
 }

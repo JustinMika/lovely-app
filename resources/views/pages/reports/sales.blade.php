@@ -77,7 +77,7 @@
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Chiffre d'Affaires</p>
                                 <p class="text-2xl font-bold text-gray-800 dark:text-white">
-                                    {{ number_format(\App\Models\Vente::sum('total'), 0, ',', ' ') }} FCFA</p>
+                                    {{ currency(\App\Models\Vente::sum('total')) }}</p>
                             </div>
                             <div class="rounded-full bg-green-100 p-2 dark:bg-green-900/20">
                                 <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
@@ -118,7 +118,7 @@
                                         $totalCA = \App\Models\Vente::sum('total');
                                         $panierMoyen = $totalVentes > 0 ? $totalCA / $totalVentes : 0;
                                     @endphp
-                                    {{ number_format($panierMoyen, 0, ',', ' ') }} FCFA
+                                    {{ currency($panierMoyen) }}
                                 </p>
                             </div>
                             <div class="rounded-full bg-orange-100 p-2 dark:bg-orange-900/20">
@@ -175,7 +175,7 @@
             const salesData = {
                 labels: @json($salesData['labels']),
                 datasets: [{
-                    label: 'Ventes (FCFA)',
+                    label: 'Ventes (' + @json(app_setting('currency_symbol', 'FC')) + ')',
                     data: @json($salesData['data']),
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -258,7 +258,7 @@
                             callbacks: {
                                 label: function(context) {
                                     return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(context
-                                        .parsed.y) + ' FCFA';
+                                        .parsed.y) + ' ' + @json(app_setting('currency_symbol', 'FC'));
                                 }
                             }
                         }
@@ -273,7 +273,7 @@
                                     return new Intl.NumberFormat('fr-FR', {
                                         notation: 'compact',
                                         compactDisplay: 'short'
-                                    }).format(value) + ' FCFA';
+                                    }).format(value) + ' ' + @json(app_setting('currency_symbol', 'FC'));
                                 }
                             }
                         }

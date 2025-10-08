@@ -12,6 +12,7 @@ use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
 class SalesManager extends Component
 {
@@ -32,6 +33,7 @@ class SalesManager extends Component
 	public $remiseTotale = 0;
 	public $montantPaye = 0;
 	public $items = [];
+	public $showPaymentModal = false;
 	public $clients = [];
 	public $lots = [];
 	public $isEditing = false;
@@ -62,21 +64,19 @@ class SalesManager extends Component
 		'page' => ['except' => 1],
 	];
 
-	protected $rules = [
-		'clientId' => 'required|exists:clients,id',
-		'items' => 'required|array|min:1',
-		'items.*.lot_id' => 'required|exists:lots,id',
-		'items.*.quantite' => 'required|integer|min:1',
-		'items.*.prix_unitaire' => 'required|numeric|min:0',
-		'items.*.remise_ligne' => 'nullable|numeric|min:0',
-		'remiseTotale' => 'nullable|numeric|min:0',
-		'montantPaye' => 'nullable|numeric|min:0',
-		'newClientData.nom' => 'required|string|max:255',
-		'newClientData.prenom' => 'required|string|max:255',
-		'newClientData.telephone' => 'nullable|string|max:20',
-		'newClientData.email' => 'nullable|email|max:255',
-		'newClientData.adresse' => 'nullable|string|max:500',
-	];
+	protected function rules()
+	{
+		return [
+			'clientId' => 'required|exists:clients,id',
+			'items' => 'required|array|min:1',
+			'items.*.lot_id' => 'required|exists:lots,id',
+			'items.*.quantite' => 'required|integer|min:1',
+			'items.*.prix_unitaire' => 'required|numeric|min:0',
+			'items.*.remise_ligne' => 'nullable|numeric|min:0',
+			'remiseTotale' => 'nullable|numeric|min:0',
+			'montantPaye' => 'nullable|numeric|min:0',
+		];
+	}
 
 	public function mount($view = 'list', $saleId = null)
 	{
@@ -88,6 +88,10 @@ class SalesManager extends Component
 
 		if ($this->currentView === 'create') {
 			$this->resetForm();
+		} elseif ($this->currentView === 'edit' && $saleId) {
+			$this->isEditing = true;
+			$this->editingSaleId = $saleId;
+			$this->loadSaleData();
 		}
 	}
 
@@ -180,10 +184,12 @@ class SalesManager extends Component
 		}
 
 		$this->lotOptions = Lot::with('article')
-			->whereHas('article', function ($query) use ($search) {
-				$query->where('designation', 'like', "%{$search}%");
+			->where(function ($query) use ($search) {
+				$query->whereHas('article', function ($q) use ($search) {
+					$q->where('designation', 'like', "%{$search}%");
+				})
+					->orWhere('numero_lot', 'like', "%{$search}%");
 			})
-			->orWhere('numero_lot', 'like', "%{$search}%")
 			->where('quantite_restante', '>', 0)
 			->limit(50)
 			->get()
@@ -191,7 +197,7 @@ class SalesManager extends Component
 				return [
 					$lot->id => "{$lot->article->designation} - {$lot->numero_lot} " .
 						"({$lot->quantite_restante} en stock - " .
-						number_format($lot->prix_vente, 0, ',', ' ') . " FCFA)"
+						currency($lot->prix_vente) . ")"
 				];
 			})
 			->toArray();
@@ -241,37 +247,36 @@ class SalesManager extends Component
 
 	public function createClient()
 	{
-		$this->validate([
-			'newClientData.nom' => 'required|string|max:255',
-			'newClientData.prenom' => 'required|string|max:255',
-			'newClientData.telephone' => 'nullable|string|max:20',
-			'newClientData.email' => 'nullable|email|max:255',
-			'newClientData.adresse' => 'nullable|string|max:500',
-		]);
+		try {
+			$this->validate([
+				'newClientData.nom' => 'required|string|max:255',
+				'newClientData.prenom' => 'required|string|max:255',
+				'newClientData.telephone' => 'nullable|string|max:20',
+				'newClientData.email' => 'nullable|email|max:255',
+				'newClientData.adresse' => 'nullable|string|max:500',
+			]);
 
-		$client = Client::create($this->newClientData);
-		$this->clientId = $client->id;
-		$this->clients = Client::orderBy('nom')->get();
+			$client = Client::create($this->newClientData);
+			$this->clientId = $client->id;
+			$this->clients = Client::orderBy('nom')->get();
 
-		$this->showClientModal = false;
-		$this->newClientData = [
-			'nom' => '',
-			'prenom' => '',
-			'telephone' => '',
-			'email' => '',
-			'adresse' => ''
-		];
+			$this->showClientModal = false;
+			$this->newClientData = [
+				'nom' => '',
+				'prenom' => '',
+				'telephone' => '',
+				'email' => '',
+				'adresse' => ''
+			];
 
-		$this->loadClientOptions();
+			$this->loadClientOptions();
 
-		$clientsForChoices = Client::all()->map(function ($client) {
-			return ['value' => $client->id, 'label' => $client->nom . ' ' . $client->prenom];
-		});
-
-		$this->dispatch('client-created', [
-			'message' => 'Client créé avec succès',
-			'clients' => $clientsForChoices->toJson()
-		]);
+			// Notification de succès
+			session()->flash('success', 'Client "' . $client->nom . ' ' . $client->prenom . '" créé avec succès et sélectionné!');
+			$this->dispatch('client-created');
+		} catch (\Exception $e) {
+			session()->flash('error', 'Erreur lors de la création du client: ' . $e->getMessage());
+		}
 	}
 
 	public function validateStock()
@@ -306,71 +311,138 @@ class SalesManager extends Component
 		return max(0, $sousTotal);
 	}
 
+	public function getResteAPayer()
+	{
+		return max(0, $this->getTotal() - $this->montantPaye);
+	}
+
+	public function getStatutVente()
+	{
+		$total = $this->getTotal();
+		$paye = $this->montantPaye;
+
+		if ($paye >= $total) {
+			return 'payée';
+		} elseif ($paye > 0) {
+			return 'partiellement_payée';
+		} else {
+			return 'impayée';
+		}
+	}
+
+	public function openPaymentModal()
+	{
+		$this->showPaymentModal = true;
+	}
+
+	public function closePaymentModal()
+	{
+		$this->showPaymentModal = false;
+	}
+
 	public function addArticleToCart()
 	{
-		$this->validate([
-			'selectedLotId' => 'required|exists:lots,id',
-			'selectedQuantity' => 'required|integer|min:1',
-			'selectedRemise' => 'nullable|numeric|min:0|max:100',
-		]);
+		try {
+			$this->validate([
+				'selectedLotId' => 'required|exists:lots,id',
+				'selectedQuantity' => 'required|integer|min:1',
+				'selectedRemise' => 'nullable|numeric|min:0|max:100',
+			]);
 
-		$lot = Lot::with('article')->find($this->selectedLotId);
+			$lot = Lot::with('article')->find($this->selectedLotId);
 
-		if ($lot->quantite_restante < $this->selectedQuantity) {
-			$this->dispatch('show-error', ['message' => 'Stock insuffisant. Disponible: ' . $lot->quantite_restante]);
-			return;
-		}
-
-		$existingItemIndex = null;
-		foreach ($this->items as $index => $item) {
-			if ($item['lot_id'] == $this->selectedLotId) {
-				$existingItemIndex = $index;
-				break;
+			if ($lot->quantite_restante < $this->selectedQuantity) {
+				LivewireAlert::title('Stock insuffisant')
+					->text('Stock disponible: ' . $lot->quantite_restante)
+					->error()
+					->show();
+				return;
 			}
-		}
 
-		if ($existingItemIndex !== null) {
-			$this->items[$existingItemIndex]['quantite'] += $this->selectedQuantity;
-		} else {
-			$this->items[] = [
-				'lot_id' => $lot->id,
-				'article_designation' => $lot->article->designation,
-				'quantite' => $this->selectedQuantity,
-				'prix_unitaire' => $lot->prix_vente,
-				'remise_ligne' => $this->selectedRemise,
-			];
-		}
+			$existingItemIndex = null;
+			foreach ($this->items as $index => $item) {
+				if ($item['lot_id'] == $this->selectedLotId) {
+					$existingItemIndex = $index;
+					break;
+				}
+			}
 
-		// Reset form
-		$this->selectedLotId = null;
-		$this->selectedQuantity = 1;
-		$this->selectedRemise = 0;
-		$this->dispatch('article-added');
+			if ($existingItemIndex !== null) {
+				$this->items[$existingItemIndex]['quantite'] += $this->selectedQuantity;
+				LivewireAlert::title('Quantité mise à jour')
+					->text('"' . $lot->article->designation . '"')
+					->success()
+					->show();
+			} else {
+				$this->items[] = [
+					'lot_id' => $lot->id,
+					'article_designation' => $lot->article->designation,
+					'quantite' => $this->selectedQuantity,
+					'prix_unitaire' => $lot->prix_vente,
+					'remise_ligne' => $this->selectedRemise,
+				];
+				LivewireAlert::title('Article ajouté au panier')
+					->text('"' . $lot->article->designation . '"')
+					->success()
+					->show();
+			}
+
+			// Reset form
+			$this->selectedLotId = null;
+			$this->selectedQuantity = 1;
+			$this->selectedRemise = 0;
+		} catch (\Exception $e) {
+			LivewireAlert::title('Erreur')
+				->text($e->getMessage())
+				->error()
+				->show();
+		}
 	}
 
 	public function saveSale()
 	{
-
 		$this->validate();
+
+		if (count($this->items) === 0) {
+			LivewireAlert::title('Panier vide')
+				->text('Veuillez ajouter au moins un article au panier')
+				->warning()
+				->show();
+			return;
+		}
 
 		try {
 			DB::beginTransaction();
 
 			// Create or update sale
+			$total = $this->getTotal();
+
 			$saleData = [
 				'client_id' => $this->clientId,
-				'user_id' => Auth::id(),
+				'utilisateur_id' => Auth::id(),
 				'remise_totale' => $this->remiseTotale ?? 0,
-				'montant_paye' => $this->montantPaye ?? 0,
-				'total' => $this->getTotal(),
-				'statut' => 'en_cours'
+				'montant_paye' => $total, // Paiement automatique du montant total
+				'total' => $total,
+				'statut' => 'payée' // Statut automatiquement "payée"
 			];
 
 			if ($this->isEditing) {
 				$sale = Vente::findOrFail($this->editingSaleId);
-				$sale->update($saleData);
+
+				// Restore stock for old line items before deleting
+				foreach ($sale->ligneVentes as $ligne) {
+					$lot = Lot::find($ligne->lot_id);
+					if ($lot) {
+						$lot->quantite_restante += $ligne->quantite;
+						$lot->save();
+					}
+				}
+
 				// Delete existing line items
 				$sale->ligneVentes()->delete();
+
+				// Update sale data
+				$sale->update($saleData);
 			} else {
 				$sale = Vente::create($saleData);
 			}
@@ -378,18 +450,21 @@ class SalesManager extends Component
 			// Create line items
 			foreach ($this->items as $item) {
 				if (!empty($item['lot_id']) && !empty($item['quantite'])) {
-					LigneVente::create([
-						'vente_id' => $sale->id,
-						'lot_id' => $item['lot_id'],
-						'quantite' => $item['quantite'],
-						'prix_unitaire' => $item['prix_unitaire'] ?? 0,
-						'remise_ligne' => $item['remise_ligne'] ?? 0,
-						'sous_total' => ($item['quantite'] * $item['prix_unitaire']) - ($item['remise_ligne'] ?? 0)
-					]);
-
-					// Update lot quantity
 					$lot = Lot::find($item['lot_id']);
+
 					if ($lot) {
+						LigneVente::create([
+							'vente_id' => $sale->id,
+							'article_id' => $lot->article_id,
+							'lot_id' => $item['lot_id'],
+							'quantite' => $item['quantite'],
+							'prix_unitaire' => $item['prix_unitaire'] ?? 0,
+							'prix_achat' => $lot->prix_achat,
+							'remise_ligne' => $item['remise_ligne'] ?? 0,
+							'sous_total' => ($item['quantite'] * $item['prix_unitaire']) - ($item['remise_ligne'] ?? 0)
+						]);
+
+						// Update lot quantity
 						$lot->quantite_restante -= $item['quantite'];
 						$lot->save();
 					}
@@ -398,18 +473,27 @@ class SalesManager extends Component
 
 			DB::commit();
 
-			$this->dispatch('sale-saved', [
-				'message' => $this->isEditing ? 'Vente mise à jour avec succès!' : 'Vente créée avec succès!',
-				'type' => 'success'
-			]);
-
-			$this->switchToList();
+			if ($this->isEditing) {
+				LivewireAlert::title('Vente mise à jour')
+					->text('Vente #' . $sale->id . ' mise à jour avec succès!')
+					->success()
+					->show();
+				$this->switchToList();
+			} else {
+				LivewireAlert::title('Vente créée avec succès!')
+					->text('Vente #' . $sale->id . ' enregistrée. Vous pouvez créer une nouvelle vente.')
+					->success()
+					->show();
+				// Réinitialiser le formulaire pour une nouvelle vente
+				$this->resetForm();
+				$this->loadFormData();
+			}
 		} catch (\Exception $e) {
 			DB::rollBack();
-			$this->dispatch('sale-saved', [
-				'message' => 'Erreur lors de l\'enregistrement: ' . $e->getMessage(),
-				'type' => 'error'
-			]);
+			LivewireAlert::title('Erreur d\'enregistrement')
+				->text($e->getMessage())
+				->error()
+				->show();
 		}
 	}
 

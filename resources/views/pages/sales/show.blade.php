@@ -129,13 +129,13 @@
                                             {{ number_format($ligne->quantite, 0, ',', ' ') }}
                                         </td>
                                         <td class="px-4 py-3 text-right text-gray-900 dark:text-white">
-                                            {{ number_format($ligne->prix_unitaire, 0, ',', ' ') }} FCFA
+                                            {{ currency($ligne->prix_unitaire) }}
                                         </td>
                                         <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-400">
-                                            {{ number_format($ligne->remise_ligne, 0, ',', ' ') }} FCFA
+                                            {{ currency($ligne->remise_ligne) }}
                                         </td>
                                         <td class="px-4 py-3 text-right font-medium text-gray-900 dark:text-white">
-                                            {{ number_format($ligne->sous_total, 0, ',', ' ') }} FCFA
+                                            {{ currency($ligne->sous_total) }}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -154,14 +154,14 @@
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Sous-total</span>
                             <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ number_format($sale->ligneVentes->sum('sous_total'), 0, ',', ' ') }} FCFA
+                                {{ currency($sale->ligneVentes->sum('sous_total')) }}
                             </span>
                         </div>
                         @if ($sale->remise_totale > 0)
                             <div class="flex justify-between">
                                 <span class="text-sm text-gray-600 dark:text-gray-400">Remise totale</span>
                                 <span class="text-sm font-medium text-red-600">
-                                    -{{ number_format($sale->remise_totale, 0, ',', ' ') }} FCFA
+                                    -{{ currency($sale->remise_totale) }}
                                 </span>
                             </div>
                         @endif
@@ -169,20 +169,20 @@
                         <div class="flex justify-between">
                             <span class="text-base font-semibold text-gray-900 dark:text-white">Total</span>
                             <span class="text-base font-bold text-gray-900 dark:text-white">
-                                {{ number_format($sale->total, 0, ',', ' ') }} FCFA
+                                {{ currency($sale->total) }}
                             </span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Montant payé</span>
                             <span class="text-sm font-medium text-green-600">
-                                {{ number_format($sale->montant_paye, 0, ',', ' ') }} FCFA
+                                {{ currency($sale->montant_paye) }}
                             </span>
                         </div>
                         @if ($sale->restant_a_payer > 0)
                             <div class="flex justify-between">
                                 <span class="text-sm text-gray-600 dark:text-gray-400">Restant à payer</span>
                                 <span class="text-sm font-medium text-red-600">
-                                    {{ number_format($sale->restant_a_payer, 0, ',', ' ') }} FCFA
+                                    {{ currency($sale->restant_a_payer) }}
                                 </span>
                             </div>
                         @endif
@@ -211,7 +211,7 @@
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Bénéfice</span>
                             <span class="text-sm font-medium text-green-600">
-                                {{ number_format($sale->benefice, 0, ',', ' ') }} FCFA
+                                {{ currency($sale->benefice) }}
                             </span>
                         </div>
                     </div>

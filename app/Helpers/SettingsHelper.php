@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\Models\Setting;
+use App\Models\AppSetting;
 
 class SettingsHelper
 {
@@ -11,26 +11,30 @@ class SettingsHelper
      */
     public static function get($key, $default = null)
     {
-        return Setting::get($key, $default);
+        $settings = AppSetting::getInstance();
+        return $settings->$key ?? $default;
     }
 
     /**
      * Définir une valeur de paramètre
      */
-    public static function set($key, $value, $type = 'string', $group = 'general', $description = null)
+    public static function set($key, $value)
     {
-        return Setting::set($key, $value, $type, $group, $description);
+        $settings = AppSetting::getInstance();
+        $settings->$key = $value;
+        return $settings->save();
     }
 
     /**
      * Formater un montant avec la devise configurée
      */
-    public static function formatCurrency($amount)
+    public static function formatCurrency($amount, $decimals = 0)
     {
-        $symbol = self::get('currency_symbol', 'FCFA');
-        $position = self::get('currency_position', 'after');
+        $settings = AppSetting::getInstance();
+        $symbol = $settings->currency_symbol ?? 'USD';
+        $position = $settings->currency_position ?? 'after';
         
-        $formattedAmount = number_format($amount, 0, ',', ' ');
+        $formattedAmount = number_format($amount, $decimals, ',', ' ');
         
         return $position === 'before' 
             ? $symbol . ' ' . $formattedAmount

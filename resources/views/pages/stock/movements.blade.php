@@ -95,10 +95,10 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ number_format($lot->prix_achat, 0, ',', ' ') }} FCFA
+                                        {{ currency($lot->prix_achat) }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ number_format($lot->prix_vente, 0, ',', ' ') }} FCFA
+                                        {{ currency($lot->prix_vente) }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <span

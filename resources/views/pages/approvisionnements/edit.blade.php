@@ -146,10 +146,10 @@
                         </td>
                         <td class="py-4">
                             <div class="text-sm text-gray-800 dark:text-white/90">
-                                Achat: €{{ number_format($lot->prix_achat, 2) }}
+                                Achat: {{ currency($lot->prix_achat, 2) }}
                             </div>
                             <div class="text-sm text-gray-800 dark:text-white/90">
-                                Vente: €{{ number_format($lot->prix_vente, 2) }}
+                                Vente: {{ currency($lot->prix_vente, 2) }}
                             </div>
                         </td>
                         <td class="py-4">

@@ -96,7 +96,7 @@
                 Valeur totale
             </label>
             <div class="text-sm font-medium text-gray-800 dark:text-white/90">
-                €{{ number_format($totalValue, 2) }}
+                {{ currency($totalValue, 2) }}
             </div>
         </div>
 
@@ -175,15 +175,15 @@
                     </td>
                     <td class="py-4">
                         <div class="text-sm text-gray-800 dark:text-white/90">
-                            Achat: €{{ number_format($lot->prix_achat, 2) }}
+                            Achat: {{ currency($lot->prix_achat, 2) }}
                         </div>
                         <div class="text-sm text-gray-800 dark:text-white/90">
-                            Vente: €{{ number_format($lot->prix_vente, 2) }}
+                            Vente: {{ currency($lot->prix_vente, 2) }}
                         </div>
                     </td>
                     <td class="py-4">
                         <div class="text-sm font-medium text-gray-800 dark:text-white/90">
-                            €{{ number_format($lot->quantite_initiale * $lot->prix_achat, 2) }}
+                            {{ currency($lot->quantite_initiale * $lot->prix_achat, 2) }}
                         </div>
                     </td>
                     <td class="py-4">
@@ -250,7 +250,7 @@
                 </div>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-gray-800 dark:text-white/90">
-                        €{{ number_format($approvisionnement->lots->sum(function($lot) { 
+                        {{ currency($approvisionnement->lots->sum(function($lot) { 
                             return ($lot->quantite_initiale - $lot->quantite_restante) * $lot->prix_vente; 
                         }), 2) }}
                     </div>
@@ -260,7 +260,7 @@
                 </div>
                 <div class="text-center">
                     <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                        €{{ number_format($approvisionnement->lots->sum(function($lot) { 
+                        {{ currency($approvisionnement->lots->sum(function($lot) { 
                             $sold = $lot->quantite_initiale - $lot->quantite_restante;
                             return $sold * ($lot->prix_vente - $lot->prix_achat); 
                         }), 2) }}

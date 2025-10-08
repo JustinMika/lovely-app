@@ -12,6 +12,7 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SaleController extends Controller
 {
@@ -217,7 +218,22 @@ class SaleController extends Controller
 	public function invoice(Vente $sale): View
 	{
 		$sale->load(['client', 'utilisateur', 'ligneVentes.article', 'ligneVentes.lot']);
+		$appSettings = \App\Models\AppSetting::getInstance();
 
-		return view('pages.sales.invoice', compact('sale'));
+		return view('pages.sales.invoice', compact('sale', 'appSettings'));
+	}
+
+	/**
+	 * Generate PDF invoice for the specified sale.
+	 */
+	public function invoicePdf(Vente $sale)
+	{
+		$sale->load(['client', 'utilisateur', 'ligneVentes.article', 'ligneVentes.lot']);
+		$appSettings = \App\Models\AppSetting::getInstance();
+
+		$pdf = Pdf::loadView('pages.sales.invoice-pdf', compact('sale', 'appSettings'));
+		$pdf->setPaper('A4', 'portrait');
+
+		return $pdf->download('facture-' . str_pad($sale->id, 6, '0', STR_PAD_LEFT) . '.pdf');
 	}
 }

@@ -1,4 +1,5 @@
  <link rel="icon" href="{{ asset('favicon.ico') }}">
+ <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
  <link href="{{ asset('css/style.css') }}" rel="stylesheet">
  <!-- Filament Forms CSS -->
  {{-- @filamentStyles --}}

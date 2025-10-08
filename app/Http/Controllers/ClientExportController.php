@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use Illuminate\Http\Request;
+use App\Models\AppSetting;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class ClientExportController extends Controller
 {
@@ -70,10 +71,17 @@ class ClientExportController extends Controller
         $pdf->Cell(40, 6, number_format($stats['total_clients']), 0, 1);
         $pdf->Cell(50, 6, 'Clients actifs:', 0, 0);
         $pdf->Cell(40, 6, number_format($stats['clients_actifs']), 0, 1);
+        // Récupérer le symbole de devise
+        $settings = AppSetting::getInstance();
+        $currencySymbol = $settings->currency_symbol ?? 'USD';
+        $currencyPosition = $settings->currency_position ?? 'after';
+        
         $pdf->Cell(50, 6, 'Montant total achats:', 0, 0);
-        $pdf->Cell(40, 6, number_format($stats['montant_total_achats'], 0, ',', ' ') . ' FCFA', 0, 1);
+        $montantFormatted = number_format($stats['montant_total_achats'], 0, ',', ' ');
+        $pdf->Cell(40, 6, ($currencyPosition === 'before' ? $currencySymbol . ' ' . $montantFormatted : $montantFormatted . ' ' . $currencySymbol), 0, 1);
         $pdf->Cell(50, 6, 'Panier moyen:', 0, 0);
-        $pdf->Cell(40, 6, number_format($stats['panier_moyen'], 0, ',', ' ') . ' FCFA', 0, 1);
+        $panierFormatted = number_format($stats['panier_moyen'], 0, ',', ' ');
+        $pdf->Cell(40, 6, ($currencyPosition === 'before' ? $currencySymbol . ' ' . $panierFormatted : $panierFormatted . ' ' . $currencySymbol), 0, 1);
         $pdf->Ln(10);
 
         // En-tête du tableau

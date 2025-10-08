@@ -1,4 +1,63 @@
 <div class="space-y-6">
+    <!-- Flash Messages -->
+    @if (session()->has('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+            class="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                        {{ session('success') }}
+                    </p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button @click="show = false" class="text-green-500 hover:text-green-700">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+            class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-red-800 dark:text-red-200">
+                        {{ session('error') }}
+                    </p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button @click="show = false" class="text-red-500 hover:text-red-700">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if ($currentView === 'list')
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -35,7 +94,7 @@
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Revenus aujourd'hui</p>
                         <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format($metrics['revenue_today'], 0, ',', ' ') }} FCFA
+                            {{ currency($metrics['revenue_today']) }}
                         </p>
                     </div>
                 </div>
@@ -76,7 +135,7 @@
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Revenus ce mois</p>
                         <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format($metrics['revenue_this_month'], 0, ',', ' ') }} FCFA
+                            {{ currency($metrics['revenue_this_month']) }}
                         </p>
                     </div>
                 </div>
@@ -97,7 +156,7 @@
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Panier moyen</p>
                         <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                            {{ number_format($metrics['average_order'], 0, ',', ' ') }} FCFA
+                            {{ currency($metrics['average_order']) }}
                         </p>
                     </div>
                 </div>
@@ -188,10 +247,10 @@
                                     {{ $sale->created_at->format('d/m/Y H:i') }}
                                 </td>
                                 <td class="px-6 py-4 text-right font-medium text-gray-900 dark:text-white">
-                                    {{ number_format($sale->total, 0, ',', ' ') }} FCFA
+                                    {{ currency($sale->total) }}
                                 </td>
                                 <td class="px-6 py-4 text-right text-green-600 dark:text-green-400">
-                                    {{ number_format($sale->montant_paye, 0, ',', ' ') }} FCFA
+                                    {{ currency($sale->montant_paye) }}
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($sale->restant_a_payer <= 0)
@@ -211,7 +270,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ route('sales.show', $sale) }}"
+                                        <a href="{{ route('sales.show', $sale->id) }}"
                                             class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                                             title="Voir">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -309,6 +368,85 @@
                 </button>
             </div>
 
+            <!-- Messages de succès et d'erreur -->
+            @if (session()->has('success'))
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+                    class="rounded-lg border border-green-200 bg-green-50 p-4 mb-6 dark:border-green-800 dark:bg-green-900/20">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Succès</h3>
+                            <p class="text-sm text-green-700 dark:text-green-300 mt-1">{{ session('success') }}</p>
+                        </div>
+                        <button @click="show = false"
+                            class="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            @endif
+
+            @if (session()->has('error'))
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)"
+                    class="rounded-lg border border-red-200 bg-red-50 p-4 mb-6 dark:border-red-800 dark:bg-red-900/20">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Erreur</h3>
+                            <p class="text-sm text-red-700 dark:text-red-300 mt-1">{{ session('error') }}</p>
+                        </div>
+                        <button @click="show = false"
+                            class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Erreurs de validation -->
+            @if ($errors->any())
+                <div x-data="{ show: true }" x-show="show"
+                    class="rounded-lg border border-orange-200 bg-orange-50 p-4 mb-6 dark:border-orange-800 dark:bg-orange-900/20">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-orange-800 dark:text-orange-200">Erreurs de validation
+                            </h3>
+                            <ul class="mt-2 text-sm text-orange-700 dark:text-orange-300 list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        <button @click="show = false"
+                            class="text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            @endif
+
             <form wire:submit.prevent="saveSale" class="space-y-6">
                 <!-- Informations Client -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
@@ -330,7 +468,7 @@
                             @enderror
                         </div>
                         <button type="button" wire:click="$set('showClientModal', true)"
-                            class="bg-green-500 shadow-theme-xs hover:bg-green-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
+                            class="bg-blue-600  hover:bg-blue-700 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
                             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none"
                                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -377,7 +515,7 @@
                         </div>
                         <div class="md:col-span-3">
                             <button type="button" wire:click="addArticleToCart"
-                                class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 w-full inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
+                                class="bg-blue-500 shadow-theme-xs hover:bg-blue-600 w-full inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-white transition">
                                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none"
                                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -410,18 +548,19 @@
                                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                         <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
                                             {{ $item['article_designation'] }}</td>
-                                        <td class="px-4 py-3">{{ number_format($item['prix_unitaire'], 0, ',', ' ') }}
-                                            FCFA</td>
+                                        <td class="px-4 py-3">{{ currency($item['prix_unitaire']) }}</td>
                                         <td class="px-4 py-3">
-                                            <input type="number" wire:model="items.{{ $index }}.quantite"
-                                                class="w-20 rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600 text-center">
+                                            <input type="number"
+                                                wire:model.live="items.{{ $index }}.quantite"
+                                                class="w-20 rounded-lg border-gray-300 text-center">
                                         </td>
                                         <td class="px-4 py-3">
-                                            <input type="number" wire:model="items.{{ $index }}.remise_ligne"
-                                                class="w-20 rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600 text-center">
+                                            <input type="number"
+                                                wire:model.live="items.{{ $index }}.remise_ligne"
+                                                class="w-20 rounded-lg border-gray-300 text-center">
                                         </td>
                                         <td class="px-4 py-3 font-medium">
-                                            {{ number_format($this->getSubTotal($item), 0, ',', ' ') }} FCFA</td>
+                                            {{ currency($this->getSubTotal($item)) }}</td>
                                         <td class="px-4 py-3">
                                             <button type="button" wire:click="removeItem({{ $index }})"
                                                 class="text-red-500 hover:text-red-700">
@@ -450,7 +589,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                                {{ number_format($this->getTotal(), 0, ',', ' ') }} FCFA</p>
+                                {{ currency($this->getTotal()) }}</p>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Total TTC</p>
                         </div>
                     </div>
@@ -458,51 +597,72 @@
 
                 <!-- Totaux et Paiement -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Récapitulatif et Paiement</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div>
-                            <label for="total-panier"
-                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Total
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Total
                                 Panier</label>
-                            <input type="text" value="{{ number_format($this->getTotal(), 0, ',', ' ') }} FCFA"
-                                readonly
-                                class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-gray-100 dark:bg-gray-800 px-4 py-2.5 text-sm">
+                            <div
+                                class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-gray-100 dark:bg-gray-800 px-4 py-2.5 text-sm flex items-center font-semibold text-gray-900 dark:text-white">
+                                {{ currency($this->getTotal()) }}
+                            </div>
                         </div>
                         <div>
-                            <label for="remise-globale"
-                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Remise
-                                Globale (%)</label>
-                            <input type="number" wire:model="remiseTotale"
-                                class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm">
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Remise
+                                Globale</label>
+                            <input type="number" wire:model.live="remiseTotale" step="0.01" min="0"
+                                placeholder="0.00"
+                                class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:text-white">
                         </div>
                         <div>
-                            <label for="montant-paye"
-                                class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Montant
-                                Payé*</label>
-                            <input type="number" wire:model="montantPaye"
-                                class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm">
-                            @error('montantPaye')
-                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                            @enderror
+                            <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Statut
+                                Paiement</label>
+                            <div
+                                class="shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-green-100 dark:bg-green-900/30 px-4 py-2.5 text-sm flex items-center font-semibold text-green-800 dark:text-green-400">
+                                ✓ Paiement Complet
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Note d'information -->
+                    <div
+                        class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <p class="text-xs text-blue-700 dark:text-blue-300">
+                            ℹ️ Le paiement sera automatiquement enregistré comme complet lors de la validation de la
+                            vente.
+                        </p>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="flex justify-end gap-4">
-                    <button type="button" wire:click="saveSale(true)"
-                        class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition">Aperçu
-                        Facture</button>
                     <button type="submit"
-                        class="bg-red-500 shadow-theme-xs hover:bg-red-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition">Valider
-                        la Vente</button>
+                        class="bg-blue-600 shadow-theme-xs hover:bg-blue-700 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13l4 4L19 7" />
+                        </svg>
+                        Valider la Vente
+                    </button>
                 </div>
             </form>
         </div>
 
         <!-- Client Modal -->
         @if ($showClientModal)
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-                <div class="bg-white rounded-lg p-6 w-full max-w-md dark:bg-gray-800">
+            <div class="fixed inset-0 flex items-center justify-center p-5 overflow-y-auto z-50">
+                <div class="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
+                    wire:click="$set('showClientModal', false)"></div>
+                <div class="relative w-full max-w-md rounded-3xl bg-white p-6 dark:bg-gray-900 lg:p-8" wire:click.stop>
+                    <!-- Bouton fermer -->
+                    <button wire:click="$set('showClientModal', false)"
+                        class="absolute right-4 top-4 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nouveau Client</h3>
 
                     <div class="space-y-4">
@@ -510,8 +670,8 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nom
                                     *</label>
-                                <input type="text" wire:model="newClientData.nom"
-                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                <input type="text" wire:model="newClientData.nom" placeholder="Ex: Dupont"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400">
                                 @error('newClientData.nom')
                                     <span class="text-red-500 text-xs">{{ $message }}</span>
                                 @enderror
@@ -519,8 +679,8 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prénom
                                     *</label>
-                                <input type="text" wire:model="newClientData.prenom"
-                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                <input type="text" wire:model="newClientData.prenom" placeholder="Ex: Jean"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400">
                                 @error('newClientData.prenom')
                                     <span class="text-red-500 text-xs">{{ $message }}</span>
                                 @enderror
@@ -531,7 +691,8 @@
                             <label
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Téléphone</label>
                             <input type="text" wire:model="newClientData.telephone"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                placeholder="Ex: +243 812 345 678"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400">
                             @error('newClientData.telephone')
                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
@@ -541,7 +702,8 @@
                             <label
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                             <input type="email" wire:model="newClientData.email"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                placeholder="Ex: client@example.com"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400">
                             @error('newClientData.email')
                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
@@ -550,22 +712,41 @@
                         <div>
                             <label
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Adresse</label>
-                            <textarea wire:model="newClientData.adresse" rows="3"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"></textarea>
+                            <textarea wire:model="newClientData.adresse" rows="3" placeholder="Ex: 123 Avenue de la Liberté, Kinshasa"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-400"></textarea>
                             @error('newClientData.adresse')
                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-4 mt-6">
+                    <div class="flex justify-end gap-3 mt-6">
                         <button type="button" wire:click="$set('showClientModal', false)"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition">
+                            class="shadow-theme-xs inline-flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-gray-700 ring-1 ring-gray-300 transition hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
                             Annuler
                         </button>
-                        <button type="button" wire:click="createClient"
-                            class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg font-medium transition">
-                            Créer
+                        <button type="button" wire:click="createClient" wire:loading.attr="disabled"
+                            class="bg-[#3b82f6] shadow-theme-xs hover:bg-[#3b82f6] focus:bg-[#3b82f6] inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition focus:outline-hidden"
+                            style="background-color: #3b82f6 !important">
+                            <svg wire:loading.remove wire:target="createClient" class="w-4 h-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                            <svg wire:loading wire:target="createClient" class="animate-spin w-4 h-4" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            <span wire:loading.remove wire:target="createClient">Créer Client</span>
+                            <span wire:loading wire:target="createClient">Création...</span>
                         </button>
                     </div>
                 </div>
@@ -573,18 +754,17 @@
         @endif
     @endif
 
-    <!-- Loading indicator -->
-    <div wire:loading class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-6 flex items-center gap-3">
-            <svg class="animate-spin h-5 w-5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
+    <!-- Loading indicator discret en haut à droite -->
+    <div wire:loading class="fixed top-4 right-4 z-50">
+        <div class="bg-brand-600 text-white rounded-lg px-4 py-2 shadow-lg flex items-center gap-2 animate-fade-in">
+            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                     stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                 </path>
             </svg>
-            <span class="text-gray-700">Chargement...</span>
+            <span class="text-sm font-medium">Chargement...</span>
         </div>
     </div>
 
@@ -615,34 +795,6 @@
                         e.detail.message,
                         e.detail.type
                     );
-                });
-
-                Livewire.on('sale-saved', (e) => {
-                    Swal.fire({
-                        icon: e.detail.type,
-                        title: e.detail.type === 'success' ? 'Succès' : 'Erreur',
-                        text: e.detail.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                });
-
-                Livewire.on('show-error', (e) => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erreur',
-                        text: e.detail.message,
-                    });
-                });
-
-                Livewire.on('client-created', (e) => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Succès',
-                        text: e.detail.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
                 });
             });
         </script>

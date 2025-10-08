@@ -130,25 +130,25 @@
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Chiffre d'affaires</span>
                     <span class="text-lg font-semibold text-green-600 dark:text-green-400">
-                        {{ number_format($financialStats['chiffre_affaires'], 0, ',', ' ') }} FCFA
+                        {{ currency($financialStats['chiffre_affaires']) }}
                     </span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Montant encaissé</span>
                     <span class="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                        {{ number_format($financialStats['montant_encaisse'], 0, ',', ' ') }} FCFA
+                        {{ currency($financialStats['montant_encaisse']) }}
                     </span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Bénéfice total</span>
                     <span class="text-lg font-semibold text-purple-600 dark:text-purple-400">
-                        {{ number_format($financialStats['benefice_total'], 0, ',', ' ') }} FCFA
+                        {{ currency($financialStats['benefice_total']) }}
                     </span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Panier moyen</span>
                     <span class="text-lg font-semibold text-gray-900 dark:text-white">
-                        {{ number_format($financialStats['panier_moyen'], 0, ',', ' ') }} FCFA
+                        {{ currency($financialStats['panier_moyen']) }}
                     </span>
                 </div>
             </div>
@@ -161,20 +161,19 @@
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Prix d'achat</span>
                     <span class="text-lg font-semibold text-red-600 dark:text-red-400">
-                        {{ number_format($financialStats['valeur_stock_achat'], 0, ',', ' ') }} FCFA
+                        {{ currency($financialStats['valeur_stock_achat']) }}
                     </span>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Prix de vente</span>
                     <span class="text-lg font-semibold text-green-600 dark:text-green-400">
-                        {{ number_format($financialStats['valeur_stock_vente'], 0, ',', ' ') }} FCFA
+                        {{ currency($financialStats['valeur_stock_vente']) }}
                     </span>
                 </div>
                 <div class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Marge potentielle</span>
                     <span class="text-lg font-semibold text-purple-600 dark:text-purple-400">
-                        {{ number_format($financialStats['valeur_stock_vente'] - $financialStats['valeur_stock_achat'], 0, ',', ' ') }}
-                        FCFA
+                        {{ currency($financialStats['valeur_stock_vente'] - $financialStats['valeur_stock_achat']) }}
                     </span>
                 </div>
             </div>
@@ -256,10 +255,10 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-semibold text-green-600 dark:text-green-400">
-                                {{ number_format($article->chiffre_affaires, 0, ',', ' ') }} FCFA
+                                {{ currency($article->chiffre_affaires) }}
                             </p>
                             <p class="text-xs text-purple-600 dark:text-purple-400">
-                                +{{ number_format($article->benefice, 0, ',', ' ') }} FCFA
+                                +{{ currency($article->benefice) }}
                             </p>
                         </div>
                     </div>
@@ -289,7 +288,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-semibold text-green-600 dark:text-green-400">
-                                {{ number_format($client->ventes_sum_total, 0, ',', ' ') }} FCFA
+                                {{ currency($client->ventes_sum_total) }}
                             </p>
                         </div>
                     </div>
