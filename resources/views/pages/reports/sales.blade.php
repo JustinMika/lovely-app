@@ -187,228 +187,231 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-                    // Configuration des couleurs pour le thème sombre
-                    const isDark = document.documentElement.classList.contains('dark');
-                    const textColor = isDark ? '#f9fafb' : '#374151';
-                    const gridColor = isDark ? '#374151' : '#e5e7eb';
+            // Configuration des couleurs pour le thème sombre
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#f9fafb' : '#374151';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
 
-                    // Données réelles depuis le contrôleur Laravel
-                    @php
-                        $currencySymbol = app_setting('currency_symbol', '$');
-                    @endphp
+            // Données réelles depuis le contrôleur Laravel
+            @php
+                $currencySymbol = app_setting('currency_symbol', 'FCFA');
+            @endphp
 
-                    const salesData = {
-                        labels: @json($salesData['labels'] ?? []),
-                        datasets: [{
-                            label: 'Ventes ({{ $currencySymbol }})',
-                            data: @json($salesData['data'] ?? []),
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    };
+            const salesData = {
+                labels: @json($salesData['labels'] ?? []),
+                datasets: [{
+                    label: 'Ventes ({{ $currencySymbol }})',
+                    data: @json($salesData['data'] ?? []),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            };
 
-                    const topProductsData = {
-                        labels: @json($topProductsData['labels'] ?? []),
-                        datasets: [{
-                            data: @json($topProductsData['data'] ?? []),
-                            backgroundColor: [
-                                '#3b82f6',
-                                '#10b981',
-                                '#f59e0b',
-                                '#ef4444',
-                                '#8b5cf6'
-                            ]
-                        }]
-                    };
+            const topProductsData = {
+                labels: @json($topProductsData['labels'] ?? []),
+                datasets: [{
+                    data: @json($topProductsData['data'] ?? []),
+                    backgroundColor: [
+                        '#3b82f6',
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#8b5cf6'
+                    ]
+                }]
+            };
 
-                    const monthlyData = {
-                        labels: @json($monthlyData['labels'] ?? []),
-                        datasets: [{
-                            label: 'Ventes',
-                            data: @json($monthlyData['data'] ?? []),
-                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                            borderColor: '#10b981',
-                            borderWidth: 1
-                        }]
-                    };
+            const monthlyData = {
+                labels: @json($monthlyData['labels'] ?? []),
+                datasets: [{
+                    label: 'Ventes',
+                    data: @json($monthlyData['data'] ?? []),
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }]
+            };
 
-                    // Configuration commune
-                    const commonOptions = {
-                        responsive: true,
-                        maintainAspectRatio: false,
+            // Configuration commune
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: textColor
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            color: textColor
+                        },
+                        grid: {
+                            color: gridColor
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: textColor
+                        },
+                        grid: {
+                            color: gridColor
+                        }
+                    }
+                }
+            };
+
+            // Données de test pour vérifier le fonctionnement
+            const testData = {
+                labels: ['Jan', 'Fév', 'Mar'],
+                datasets: [{
+                    label: 'Test',
+                    data: [10, 20, 30],
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderColor: '#3b82f6'
+                }]
+            };
+
+            // Graphique de test
+            const testCanvas = document.createElement('canvas');
+            testCanvas.id = 'testChart';
+            testCanvas.width = 400;
+            testCanvas.height = 200;
+            testCanvas.style.border = '1px solid red';
+            document.body.appendChild(testCanvas);
+
+            const testCtx = testCanvas.getContext('2d');
+            new Chart(testCtx, {
+                type: 'line',
+                data: testData,
+                options: {
+                    responsive: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Graphique de Test'
+                        }
+                    }
+                }
+            });
+
+            // Vérifier les vraies données maintenant
+            console.log('Real Sales Data:', salesData);
+            console.log('Real Top Products Data:', topProductsData);
+            console.log('Real Monthly Data:', monthlyData);
+
+            // Graphique d'évolution des ventes
+            const salesCanvas = document.getElementById('salesChart');
+            console.log('Sales Canvas:', salesCanvas);
+            if (salesCanvas && salesData.labels && salesData.labels.length > 0) {
+                console.log('Creating sales chart with data:', salesData.labels.length, 'points');
+                const salesCtx = salesCanvas.getContext('2d');
+                new Chart(salesCtx, {
+                    type: 'line',
+                    data: salesData,
+                    options: {
+                        ...commonOptions,
                         plugins: {
-                            legend: {
-                                labels: {
-                                    color: textColor
+                            ...commonOptions.plugins,
+                            title: {
+                                display: true,
+                                text: 'Évolution mensuelle du chiffre d\'affaires',
+                                color: textColor
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(context
+                                            .parsed.y) + ' {{ $currencySymbol }}';
+                                    }
                                 }
                             }
                         },
                         scales: {
+                            ...commonOptions.scales,
                             y: {
+                                ...commonOptions.scales.y,
                                 ticks: {
-                                    color: textColor
-                                },
-                                grid: {
-                                    color: gridColor
+                                    ...commonOptions.scales.y.ticks,
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('fr-FR', {
+                                            notation: 'compact',
+                                            compactDisplay: 'short'
+                                        }).format(value) + ' {{ $currencySymbol }}';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.log('Sales chart not created - no canvas or no data');
+            }
+
+            // Graphique des top produits
+            const topProductsCanvas = document.getElementById('topProductsChart');
+            console.log('Top Products Canvas:', topProductsCanvas);
+            if (topProductsCanvas && topProductsData.labels && topProductsData.labels.length > 0) {
+                console.log('Creating top products chart with data:', topProductsData.labels.length, 'items');
+                const topProductsCtx = topProductsCanvas.getContext('2d');
+                new Chart(topProductsCtx, {
+                    type: 'doughnut',
+                    data: topProductsData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: textColor,
+                                    padding: 20
                                 }
                             },
-                            x: {
-                                ticks: {
-                                    color: textColor
-                                },
-                                grid: {
-                                    color: gridColor
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        return label + ': ' + new Intl.NumberFormat('fr-FR').format(value) +
+                                            ' unités';
+                                    }
                                 }
                             }
                         }
-                    };
-
-                    // Données de test pour vérifier le fonctionnement
-                    const testData = {
-                        labels: ['Jan', 'Fév', 'Mar'],
-                        datasets: [{
-                            label: 'Test',
-                            data: [10, 20, 30],
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderColor: '#3b82f6'
-                        }]
-                    };
-
-                    // Graphique de test
-                    const testCanvas = document.createElement('canvas');
-                    testCanvas.id = 'testChart';
-                    testCanvas.width = 400;
-                    testCanvas.height = 200;
-                    testCanvas.style.border = '1px solid red';
-                    document.body.appendChild(testCanvas);
-
-                    const testCtx = testCanvas.getContext('2d');
-                    new Chart(testCtx, {
-                        type: 'line',
-                        data: testData,
-                        options: {
-                            responsive: false,
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: 'Graphique de Test'
-                                }
-                            }
-                        }
-                    });
-
-                    // Vérifier les vraies données maintenant
-                    console.log('Real Sales Data:', salesData);
-                    console.log('Real Top Products Data:', topProductsData);
-                    console.log('Real Monthly Data:', monthlyData);
-
-                    // Graphique d'évolution des ventes
-                    const salesCanvas = document.getElementById('salesChart');
-                    console.log('Sales Canvas:', salesCanvas);
-                    if (salesCanvas && salesData.labels && salesData.labels.length > 0) {
-                        console.log('Creating sales chart with data:', salesData.labels.length, 'points');
-                        const salesCtx = salesCanvas.getContext('2d');
-                        new Chart(salesCtx, {
-                            type: 'line',
-                            data: salesData,
-                            options: {
-                                ...commonOptions,
-                                plugins: {
-                                    ...commonOptions.plugins,
-                                    title: {
-                                        display: true,
-                                        text: 'Évolution mensuelle du chiffre d\'affaires',
-                                        color: textColor
-                                    },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function(context) {
-                                                return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(context
-                                                    .parsed.y) + ' {{ $currencySymbol }}';
-                                            }
-                                        }
-                                    }
-                                },
-                                scales: {
-                                    ...commonOptions.scales,
-                                    y: {
-                                        ...commonOptions.scales.y,
-                                        ticks: {
-                                            ...commonOptions.scales.y.ticks,
-                                            callback: function(value) {
-                                                return new Intl.NumberFormat('fr-FR', {
-                                                    notation: 'compact',
-                                                    compactDisplay: 'short'
-                                                }).format(value) + ' {{ $currencySymbol }}';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        console.log('Sales chart not created - no canvas or no data');
                     }
+                });
+            } else {
+                console.log('Top products chart not created - no canvas or no data');
+            }
 
-                    // Graphique des top produits
-                    const topProductsCanvas = document.getElementById('topProductsChart');
-                    console.log('Top Products Canvas:', topProductsCanvas);
-                    if (topProductsCanvas && topProductsData.labels && topProductsData.labels.length > 0) {
-                        console.log('Creating top products chart with data:', topProductsData.labels.length, 'items');
-                        const topProductsCtx = topProductsCanvas.getContext('2d');
-                        new Chart(topProductsCtx, {
-                            type: 'doughnut',
-                            data: topProductsData,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        position: 'bottom',
-                                        labels: {
-                                            color: textColor,
-                                            padding: 20
-                                        }
-                                    },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function(context) {
-                                                const label = context.label || '';
-                                                const value = context.parsed || 0;
-                                                return label + ': ' + new Intl.NumberFormat('fr-FR').format(value) +
-                                                    ' unités';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        console.log('Top products chart not created - no canvas or no data');
-                    }
+            // Graphique mensuel
+            const monthlyCanvas = document.getElementById('monthlyChart');
+            console.log('Monthly Canvas:', monthlyCanvas);
+            if (monthlyCanvas && monthlyData.labels && monthlyData.labels.length > 0) {
+                console.log('Creating monthly chart with data:', monthlyData.labels.length, 'points');
+                const monthlyCtx = monthlyCanvas.getContext('2d');
+                new Chart(monthlyCtx, {
+                    type: 'bar',
+                    data: monthlyData,
+                    options: commonOptions
+                });
+            } else {
+                console.log('Monthly chart not created - no canvas or no data');
+            }
 
-                    // Graphique mensuel
-                    const monthlyCanvas = document.getElementById('monthlyChart');
-                    console.log('Monthly Canvas:', monthlyCanvas);
-                    if (monthlyCanvas && monthlyData.labels && monthlyData.labels.length > 0) {
-                        console.log('Creating monthly chart with data:', monthlyData.labels.length, 'points');
-                        const monthlyCtx = monthlyCanvas.getContext('2d');
-                        new Chart(monthlyCtx, {
-                            type: 'bar',
-                            data: monthlyData,
-                            options: commonOptions
-                        });
-                    } else {
-                        console.log('Monthly chart not created - no canvas or no data');
-                    }
+            // Synchroniser les valeurs pour l'export PDF
+            document.getElementById('date_from').addEventListener('change', function() {
+                document.getElementById('export_date_from').value = this.value;
+            });
 
-                    // Synchroniser les valeurs pour l'export PDF
-                    document.getElementById('date_from').addEventListener('change', function() {
-                        document.getElementById('export_date_from').value = this.value;
-                    });
-
-                    document.getElementById('date_to').addEventListener('change', function() {
-                        document.getElementById('export_date_to').value = this.value;
-                    });
+            document.getElementById('date_to').addEventListener('change', function() {
+                document.getElementById('export_date_to').value = this.value;
+            });
+        });
+    </script>
+@endpush
