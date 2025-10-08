@@ -91,9 +91,8 @@ Route::middleware(['auth'])->group(function () {
 	Route::prefix('reports')->name('reports.')->middleware(['role:Admin,Gérant'])->group(function () {
 		Route::get('/sales', [App\Http\Controllers\SalesReportController::class, 'index'])->name('sales');
 		Route::post('/sales/pdf', [App\Http\Controllers\SalesReportController::class, 'exportPdf'])->name('sales.pdf');
-		Route::get('/financial', function () {
-			return view('pages.reports.financial');
-		})->name('financial');
+		Route::get('/financial', [App\Http\Controllers\FinancialReportController::class, 'index'])->name('financial');
+		Route::post('/financial/pdf', [App\Http\Controllers\FinancialReportController::class, 'exportPdf'])->name('financial.pdf');
 		Route::get('/stock', function () {
 			return view('pages.reports.stock');
 		})->name('stock');
