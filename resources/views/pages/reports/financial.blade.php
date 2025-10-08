@@ -241,7 +241,10 @@
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Bénéfice par Vente</p>
                         @php
-                            $profitPerSale = $financialMetrics['total_sales'] > 0 ? $financialMetrics['gross_profit'] / $financialMetrics['total_sales'] : 0;
+                            $profitPerSale =
+                                $financialMetrics['total_sales'] > 0
+                                    ? $financialMetrics['gross_profit'] / $financialMetrics['total_sales']
+                                    : 0;
                         @endphp
                         <p class="text-xl font-bold text-gray-900 dark:text-white">
                             {{ currency($profitPerSale) }}</p>

@@ -92,6 +92,38 @@
         </div>
     </div>
 
+    <!-- Weekly Performance Chart -->
+    <div class="mt-4 md:mt-6 2xl:mt-7.5">
+        <div
+            class="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-7.5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-7.5">
+            <div class="mb-4 flex items-center justify-between">
+                <div>
+                    <h5 class="text-xl font-semibold text-black dark:text-white">
+                        Performance des 7 derniers jours
+                    </h5>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        Évolution des ventes et du chiffre d'affaires
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        <span class="h-2 w-2 rounded-full bg-blue-600"></span>
+                        Ventes
+                    </span>
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                        <span class="h-2 w-2 rounded-full bg-green-600"></span>
+                        Chiffre d'affaires
+                    </span>
+                </div>
+            </div>
+            <div class="h-80">
+                <canvas id="weeklyPerformanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Recent Activities Section -->
     <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
         <div class="col-span-12">
@@ -155,3 +187,162 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration pour le thème sombre
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#f9fafb' : '#374151';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
+
+            @php
+                $currencySymbol = app_setting('currency_symbol', 'FCFA');
+            @endphp
+
+            // Graphique de performance hebdomadaire
+            const ctx = document.getElementById('weeklyPerformanceChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: @json($chartData['labels']),
+                        datasets: [{
+                                label: 'Nombre de ventes',
+                                data: @json($chartData['sales']),
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y',
+                                borderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#3b82f6',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            },
+                            {
+                                label: 'Chiffre d\'affaires ({{ $currencySymbol }})',
+                                data: @json($chartData['revenue']),
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y1',
+                                borderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // On utilise les badges personnalisés
+                            },
+                            tooltip: {
+                                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                                titleColor: textColor,
+                                bodyColor: textColor,
+                                borderColor: gridColor,
+                                borderWidth: 1,
+                                padding: 12,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            if (context.datasetIndex === 1) {
+                                                label += new Intl.NumberFormat('fr-FR').format(context
+                                                    .parsed.y) + ' {{ $currencySymbol }}';
+                                            } else {
+                                                label += context.parsed.y;
+                                            }
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Nombre de ventes',
+                                    color: textColor,
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    precision: 0
+                                },
+                                grid: {
+                                    color: gridColor,
+                                    drawBorder: false
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Chiffre d\'affaires ({{ $currencySymbol }})',
+                                    color: textColor,
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                },
+                                ticks: {
+                                    color: textColor,
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('fr-FR', {
+                                            notation: 'compact',
+                                            compactDisplay: 'short'
+                                        }).format(value);
+                                    }
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: textColor,
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: gridColor,
+                                    drawBorder: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+@endpush

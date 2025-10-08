@@ -103,3 +103,4 @@
          throw fetch("/cdn-cgi/zaraz/t"), e;
      };
  </script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
