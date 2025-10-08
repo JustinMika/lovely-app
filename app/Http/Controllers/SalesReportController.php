@@ -59,6 +59,7 @@ class SalesReportController extends Controller
 		// En-tête principal
 		$appSettings = \App\Models\AppSetting::getInstance();
 		$companyName = $appSettings->company_name ?? $appSettings->app_name;
+		$currencySymbol = $appSettings->currency_symbol ?? '$';
 
 		$pdf->Cell(0, 12, 'RAPPORT DES VENTES - ' . $companyName, 0, 1, 'C');
 		$pdf->SetFont('Arial', '', 10);
@@ -77,11 +78,11 @@ class SalesReportController extends Controller
 		$pdf->Cell(95, 6, 'Total des ventes: ' . number_format($generalStats['total_ventes']), 0, 0, 'L');
 		$pdf->Cell(95, 6, 'Ventes aujourd\'hui: ' . number_format($generalStats['ventes_aujourdhui']), 0, 1, 'L');
 
-		$pdf->Cell(95, 6, 'Chiffre d\'affaires: ' . number_format($generalStats['chiffre_affaires'], 0, ',', ' ') . ' FCFA', 0, 0, 'L');
-		$pdf->Cell(95, 6, 'Montant encaisse: ' . number_format($generalStats['montant_encaisse'], 0, ',', ' ') . ' FCFA', 0, 1, 'L');
+		$pdf->Cell(95, 6, 'Chiffre d\'affaires: ' . number_format($generalStats['chiffre_affaires'], 0, ',', ' ') . ' ' . $currencySymbol, 0, 0, 'L');
+		$pdf->Cell(95, 6, 'Montant encaisse: ' . number_format($generalStats['montant_encaisse'], 0, ',', ' ') . ' ' . $currencySymbol, 0, 1, 'L');
 
-		$pdf->Cell(95, 6, 'Benefice total: ' . number_format($beneficeTotal->benefice_total ?? 0, 0, ',', ' ') . ' FCFA', 0, 0, 'L');
-		$pdf->Cell(95, 6, 'Panier moyen: ' . number_format($panierMoyen, 0, ',', ' ') . ' FCFA', 0, 1, 'L');
+		$pdf->Cell(95, 6, 'Benefice total: ' . number_format($beneficeTotal->benefice_total ?? 0, 0, ',', ' ') . ' ' . $currencySymbol, 0, 0, 'L');
+		$pdf->Cell(95, 6, 'Panier moyen: ' . number_format($panierMoyen, 0, ',', ' ') . ' ' . $currencySymbol, 0, 1, 'L');
 
 		$pdf->Ln(8);
 
@@ -103,7 +104,7 @@ class SalesReportController extends Controller
 				$salesCount = $salesData['sales_count'][$i] ?? 0;
 
 				$pdf->Cell(80, 5, $label, 1, 0, 'L');
-				$pdf->Cell(50, 5, number_format($value, 0, ',', ' ') . ' FCFA', 1, 0, 'R');
+				$pdf->Cell(50, 5, number_format($value, 0, ',', ' ') . ' ' . $currencySymbol, 1, 0, 'R');
 				$pdf->Cell(30, 5, number_format($salesCount), 1, 1, 'C');
 			}
 			$pdf->Ln(5);
