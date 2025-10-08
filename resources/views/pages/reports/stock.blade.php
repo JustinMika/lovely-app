@@ -79,8 +79,8 @@
                                 {{ currency($stockMetrics['stock_value']) }}
                             </p>
                             <div class="mt-2">
-                                <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                     </path>
@@ -157,7 +157,8 @@
                                             <tr class="border-b border-gray-100 dark:border-gray-700/50">
                                                 <td class="py-2 text-gray-800 dark:text-white">
                                                     {{ $product['designation'] }}</td>
-                                                <td class="py-2 text-center text-orange-600 dark:text-orange-400 font-medium">
+                                                <td
+                                                    class="py-2 text-center text-orange-600 dark:text-orange-400 font-medium">
                                                     {{ number_format($product['stock_quantity']) }}</td>
                                                 <td class="py-2 text-center text-gray-600 dark:text-gray-400">
                                                     {{ number_format($product['seuil_alerte']) }}</td>
@@ -181,7 +182,8 @@
                                         <tr class="border-b border-gray-200 dark:border-gray-700">
                                             <th class="pb-2 text-left font-medium text-gray-600 dark:text-gray-400">Produit
                                             </th>
-                                            <th class="pb-2 text-center font-medium text-gray-600 dark:text-gray-400">N° Lot
+                                            <th class="pb-2 text-center font-medium text-gray-600 dark:text-gray-400">N°
+                                                Lot
                                             </th>
                                             <th class="pb-2 text-center font-medium text-gray-600 dark:text-gray-400">
                                                 Expiration</th>
@@ -210,7 +212,8 @@
                 </div>
 
                 <!-- Stock Distribution Chart -->
-                <div class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50">
+                <div
+                    class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800/50">
                     <h3 class="mb-4 text-lg font-medium text-gray-800 dark:text-white">Répartition du Stock</h3>
                     <div class="h-80">
                         <canvas id="stockChart"></canvas>

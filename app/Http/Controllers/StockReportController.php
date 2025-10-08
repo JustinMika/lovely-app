@@ -201,8 +201,9 @@ class StockReportController extends Controller
 	{
 		// Grouper par statut actif/inactif
 		$categories = Article::select('actif')
-			->selectRaw('COUNT(*) as product_count')
-			->selectRaw('(SELECT COALESCE(SUM(quantite_restante), 0) FROM lots WHERE lots.article_id = articles.id) as total_stock')
+			->selectRaw('COUNT(DISTINCT articles.id) as product_count')
+			->selectRaw('COALESCE(SUM(lots.quantite_restante), 0) as total_stock')
+			->leftJoin('lots', 'articles.id', '=', 'lots.article_id')
 			->groupBy('actif')
 			->get();
 
