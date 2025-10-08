@@ -28,7 +28,7 @@ class GlobalReportController extends Controller
 		return view('pages.reports.sales', compact('salesData', 'topProductsData', 'monthlyData'));
 	}
 
-	public function exportGlobal(Request $request)
+	public function exportPdf(Request $request)
 	{
 		$dateRange = $request->get('dateRange', 30);
 		$selectedPeriod = $request->get('selectedPeriod', 'month');
