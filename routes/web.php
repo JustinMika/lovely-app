@@ -93,9 +93,8 @@ Route::middleware(['auth'])->group(function () {
 		Route::post('/sales/pdf', [App\Http\Controllers\SalesReportController::class, 'exportPdf'])->name('sales.pdf');
 		Route::get('/financial', [App\Http\Controllers\FinancialReportController::class, 'index'])->name('financial');
 		Route::post('/financial/pdf', [App\Http\Controllers\FinancialReportController::class, 'exportPdf'])->name('financial.pdf');
-		Route::get('/stock', function () {
-			return view('pages.reports.stock');
-		})->name('stock');
+		Route::get('/stock', [App\Http\Controllers\StockReportController::class, 'index'])->name('stock');
+		Route::post('/stock/pdf', [App\Http\Controllers\StockReportController::class, 'exportPdf'])->name('stock.pdf');
 		Route::get('/exports', function () {
 			return view('pages.reports.exports');
 		})->name('exports');
