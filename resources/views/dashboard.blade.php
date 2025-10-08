@@ -39,7 +39,7 @@
             </div>
             <div class="mt-4 flex items-end justify-between">
                 <div>
-                    <h4 class="text-title-md font-bold text-black dark:text-white">
+                    <h4 class="text-title-md font-bold text-black ">
                         {{ currency($metrics['total_revenue']) }}
                     </h4>
                     <span class="text-sm font-medium">Chiffre d'affaires</span>
@@ -61,7 +61,7 @@
             </div>
             <div class="mt-4 flex items-end justify-between">
                 <div>
-                    <h4 class="text-title-md font-bold text-black dark:text-white">
+                    <h4 class="text-title-md font-bold text-black ">
                         {{ number_format($metrics['total_clients']) }}
                     </h4>
                     <span class="text-sm font-medium">Total clients</span>
@@ -83,7 +83,7 @@
             </div>
             <div class="mt-4 flex items-end justify-between">
                 <div>
-                    <h4 class="text-title-md font-bold text-black dark:text-white">
+                    <h4 class="text-title-md font-bold text-black">
                         {{ $metrics['low_stock_alerts'] }}
                     </h4>
                     <span class="text-sm font-medium">Alertes stock</span>
@@ -98,7 +98,7 @@
             class="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-7.5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-7.5">
             <div class="mb-4 flex items-center justify-between">
                 <div>
-                    <h5 class="text-xl font-semibold text-black dark:text-white">
+                    <h5 class="text-xl font-semibold text-black ">
                         Performance des 7 derniers jours
                     </h5>
                     <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -131,7 +131,7 @@
                 class="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-7.5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-7.5">
                 <div class="mb-3 justify-between gap-4 sm:flex">
                     <div>
-                        <h5 class="text-xl font-semibold text-black dark:text-white">
+                        <h5 class="text-xl font-semibold text-black ">
                             Activités récentes
                         </h5>
                     </div>
@@ -160,11 +160,11 @@
                                     class="inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-600 rounded-full text-sm font-medium dark:bg-green-900 dark:text-green-400">
                                     {{ strtoupper(substr($activity['type'], 0, 1)) }}
                                 </span>
-                                <p class="text-black dark:text-white">{{ ucfirst($activity['type']) }}</p>
+                                <p class="text-black ">{{ ucfirst($activity['type']) }}</p>
                             </div>
 
                             <div class="flex items-center justify-center p-2.5 xl:p-5">
-                                <p class="text-black dark:text-white">{{ $activity['description'] }}</p>
+                                <p class="text-black ">{{ $activity['description'] }}</p>
                             </div>
 
                             <div class="flex items-center justify-center p-2.5 xl:p-5">
@@ -194,7 +194,7 @@
         window.addEventListener('load', function() {
             console.log('Dashboard script loaded');
             console.log('Chart available:', typeof Chart !== 'undefined');
-            
+
             // Configuration pour le thème sombre
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#f9fafb' : '#374151';
@@ -207,10 +207,10 @@
             // Graphique de performance hebdomadaire
             const canvas = document.getElementById('weeklyPerformanceChart');
             console.log('Canvas element found:', canvas !== null);
-            
+
             if (canvas && typeof Chart !== 'undefined') {
                 console.log('Creating chart with data:', @json($chartData));
-                
+
                 const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'line',

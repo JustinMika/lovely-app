@@ -276,29 +276,6 @@
                 }]
             };
 
-            // Graphique de test
-            const testCanvas = document.createElement('canvas');
-            testCanvas.id = 'testChart';
-            testCanvas.width = 400;
-            testCanvas.height = 200;
-            testCanvas.style.border = '1px solid red';
-            document.body.appendChild(testCanvas);
-
-            const testCtx = testCanvas.getContext('2d');
-            new Chart(testCtx, {
-                type: 'line',
-                data: testData,
-                options: {
-                    responsive: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: 'Graphique de Test'
-                        }
-                    }
-                }
-            });
-
             // Vérifier les vraies données maintenant
             console.log('Real Sales Data:', salesData);
             console.log('Real Top Products Data:', topProductsData);
@@ -325,7 +302,8 @@
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(context
+                                        return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(
+                                            context
                                             .parsed.y) + ' {{ $currencySymbol }}';
                                     }
                                 }
@@ -377,7 +355,8 @@
                                     label: function(context) {
                                         const label = context.label || '';
                                         const value = context.parsed || 0;
-                                        return label + ': ' + new Intl.NumberFormat('fr-FR').format(value) +
+                                        return label + ': ' + new Intl.NumberFormat('fr-FR').format(
+                                                value) +
                                             ' unités';
                                     }
                                 }
