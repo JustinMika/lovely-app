@@ -307,10 +307,12 @@
         <!-- Payment Status -->
         <div class="status-section">
             <div class="section-title">Statut du paiement:</div>
-            @if ($resteAPayer <= 0)
+            @if ($sale->statut == 'payée')
                 <span class="status-paid">✓ Payé intégralement</span>
-            @else
+            @elseif($sale->statut == 'partiellement_payée')
                 <span class="status-partial">⚠ Paiement partiel</span>
+            @else
+                <span class="status-partial" style="background-color: #fee2e2; color: #991b1b;">✗ Impayée</span>
             @endif
         </div>
 

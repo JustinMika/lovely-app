@@ -17,6 +17,7 @@ class Vente extends Model
         'total',
         'remise_totale',
         'montant_paye',
+        'statut',
     ];
 
     protected $casts = [

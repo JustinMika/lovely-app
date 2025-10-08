@@ -67,9 +67,6 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/invoices', function () {
 			return view('pages.sales.invoices');
 		})->name('invoices');
-		Route::get('/payments', function () {
-			return view('pages.sales.payments');
-		})->name('payments');
 	});
 
 	// Factures - All authenticated users
@@ -80,13 +77,6 @@ Route::middleware(['auth'])->group(function () {
 		Route::get('/search', function () {
 			return view('pages.sales.search');
 		})->name('search');
-	});
-
-	// Paiements - All authenticated users
-	Route::prefix('payments')->name('payments.')->group(function () {
-		Route::get('/', function () {
-			return view('pages.sales.payments');
-		})->name('index');
 	});
 
 	// Clients - All authenticated users

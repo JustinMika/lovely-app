@@ -187,7 +187,7 @@
                         <a href="#" @click.prevent="selected = (selected === 'Ventes' ? '':'Ventes')"
                             class="menu-item group"
                             :class="(selected === 'Ventes') || (page === 'newSale' || page === 'invoices' ||
-                                page === 'searchInvoice' || page === 'payments') ? 'menu-item-active' :
+                                page === 'searchInvoice') ? 'menu-item-active' :
                             'menu-item-inactive'">
                             <svg :class="(selected === 'Ventes') || (page === 'newSale' || page === 'invoices') ?
                             'menu-item-icon-active' :
@@ -241,13 +241,6 @@
                                         :class="page === 'searchInvoice' ? 'menu-dropdown-item-active' :
                                             'menu-dropdown-item-inactive'">
                                         Rechercher une facture
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('payments.index') }}" class="menu-dropdown-item group"
-                                        :class="page === 'payments' ? 'menu-dropdown-item-active' :
-                                            'menu-dropdown-item-inactive'">
-                                        Règlements clients
                                     </a>
                                 </li>
                             </ul>

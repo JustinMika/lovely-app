@@ -196,15 +196,20 @@
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-gray-600 dark:text-gray-400">Paiement</span>
-                            @if ($sale->restant_a_payer <= 0)
+                            @if ($sale->statut == 'payée')
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                    Payé
+                                    Payée
+                                </span>
+                            @elseif($sale->statut == 'partiellement_payée')
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300">
+                                    Partiellement payée
                                 </span>
                             @else
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                    Impayé
+                                    Impayée
                                 </span>
                             @endif
                         </div>

@@ -195,15 +195,20 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 dark:text-gray-400 print:text-gray-600">Statut du paiement:</p>
-                        @if ($sale->restant_a_payer <= 0)
+                        @if ($sale->statut == 'payée')
                             <span
                                 class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 print:bg-green-100 print:text-green-800">
                                 ✓ Payé intégralement
                             </span>
+                        @elseif($sale->statut == 'partiellement_payée')
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800 print:bg-orange-100 print:text-orange-800">
+                                ⚠ Paiement partiel
+                            </span>
                         @else
                             <span
                                 class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 print:bg-red-100 print:text-red-800">
-                                ⚠ Paiement partiel
+                                ✗ Impayée
                             </span>
                         @endif
                     </div>

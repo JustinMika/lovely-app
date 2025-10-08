@@ -66,13 +66,25 @@ class SaleController extends Controller
 				$total += $sousTotal;
 			}
 
+			$montantPaye = $validated['montant_paye'] ?? 0;
+
+			// Déterminer le statut de paiement
+			if ($montantPaye >= $total) {
+				$statut = 'payée';
+			} elseif ($montantPaye > 0) {
+				$statut = 'partiellement_payée';
+			} else {
+				$statut = 'impayée';
+			}
+
 			// Créer la vente
 			$vente = Vente::create([
 				'utilisateur_id' => Auth::id(),
 				'client_id' => $validated['client_id'],
 				'total' => $total,
 				'remise_totale' => $validated['remise_totale'] ?? 0,
-				'montant_paye' => $validated['montant_paye'] ?? 0,
+				'montant_paye' => $montantPaye,
+				'statut' => $statut,
 			]);
 
 			// Créer les lignes de vente et réduire le stock
@@ -159,12 +171,24 @@ class SaleController extends Controller
 				$total += $sousTotal;
 			}
 
+			$montantPaye = $validated['montant_paye'] ?? 0;
+
+			// Déterminer le statut de paiement
+			if ($montantPaye >= $total) {
+				$statut = 'payée';
+			} elseif ($montantPaye > 0) {
+				$statut = 'partiellement_payée';
+			} else {
+				$statut = 'impayée';
+			}
+
 			// Mettre à jour la vente
 			$sale->update([
 				'client_id' => $validated['client_id'],
 				'total' => $total,
 				'remise_totale' => $validated['remise_totale'] ?? 0,
-				'montant_paye' => $validated['montant_paye'] ?? 0,
+				'montant_paye' => $montantPaye,
+				'statut' => $statut,
 			]);
 
 			// Créer les nouvelles lignes de vente et réduire le stock
