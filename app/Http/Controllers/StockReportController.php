@@ -158,11 +158,11 @@ class StockReportController extends Controller
 	{
 		$totalProducts = Article::where('actif', true)->count();
 
-		// Total du stock (somme des quantités de tous les lots)
-		$totalStock = Lot::sum('quantite');
+		// Total du stock (somme des quantités restantes de tous les lots)
+		$totalStock = Lot::sum('quantite_restante');
 
-		// Valeur du stock (quantité * prix d'achat)
-		$stockValue = Lot::selectRaw('SUM(quantite * prix_achat) as value')->first()->value ?? 0;
+		// Valeur du stock (quantité restante * prix d'achat)
+		$stockValue = Lot::selectRaw('SUM(quantite_restante * prix_achat) as value')->first()->value ?? 0;
 
 		// Stock moyen par produit
 		$averageStock = $totalProducts > 0 ? $totalStock / $totalProducts : 0;
@@ -172,12 +172,17 @@ class StockReportController extends Controller
 		$lowStockThreshold = $appSettings->low_stock_threshold ?? 10;
 
 		// Produits en rupture de stock (stock = 0)
-		$outOfStock = Article::whereDoesntHave('lots')->count();
+		$outOfStock = Article::whereDoesntHave('lots', function ($query) {
+			$query->where('quantite_restante', '>', 0);
+		})->count();
 
 		// Produits en stock bas (stock < seuil d'alerte)
-		$lowStock = Article::whereHas('lots', function ($query) use ($lowStockThreshold) {
-			$query->havingRaw('SUM(quantite) < ?', [$lowStockThreshold]);
-		})->count();
+		$lowStock = Article::select('articles.id')
+			->leftJoin('lots', 'articles.id', '=', 'lots.article_id')
+			->where('articles.actif', true)
+			->groupBy('articles.id')
+			->havingRaw('COALESCE(SUM(lots.quantite_restante), 0) > 0 AND COALESCE(SUM(lots.quantite_restante), 0) < ?', [$lowStockThreshold])
+			->count();
 
 		return [
 			'total_products' => $totalProducts,
@@ -197,7 +202,7 @@ class StockReportController extends Controller
 		// Grouper par statut actif/inactif
 		$categories = Article::select('actif')
 			->selectRaw('COUNT(*) as product_count')
-			->selectRaw('(SELECT COALESCE(SUM(quantite), 0) FROM lots WHERE lots.article_id = articles.id) as total_stock')
+			->selectRaw('(SELECT COALESCE(SUM(quantite_restante), 0) FROM lots WHERE lots.article_id = articles.id) as total_stock')
 			->groupBy('actif')
 			->get();
 
@@ -222,7 +227,7 @@ class StockReportController extends Controller
 		$lowStockThreshold = $appSettings->low_stock_threshold ?? 10;
 
 		return Article::select('articles.id', 'articles.designation')
-			->selectRaw('COALESCE(SUM(lots.quantite), 0) as stock_quantity')
+			->selectRaw('COALESCE(SUM(lots.quantite_restante), 0) as stock_quantity')
 			->selectRaw('? as seuil_alerte', [$lowStockThreshold])
 			->leftJoin('lots', 'articles.id', '=', 'lots.article_id')
 			->where('articles.actif', true)
@@ -243,7 +248,7 @@ class StockReportController extends Controller
 			->join('articles', 'lots.article_id', '=', 'articles.id')
 			->where('lots.date_expiration', '<=', Carbon::now()->addDays(30))
 			->where('lots.date_expiration', '>=', Carbon::now())
-			->where('lots.quantite', '>', 0)
+			->where('lots.quantite_restante', '>', 0)
 			->orderBy('lots.date_expiration', 'asc')
 			->limit(20)
 			->get()
