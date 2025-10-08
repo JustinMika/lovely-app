@@ -24,9 +24,21 @@
     <div class="space-y-6">
         <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
             <div class="border-b border-gray-200 px-6 py-4 dark:border-gray-800">
-                <h2 class="text-lg font-medium text-gray-800 dark:text-white">
-                    Analyse des Ventes
-                </h2>
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-medium text-gray-800 dark:text-white">
+                        Analyse des Ventes
+                    </h2>
+                    <div class="flex items-center gap-3">
+                        <button
+                            class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l4-4m-4 4l-4-4m8 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Exporter PDF
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="p-4 sm:p-6">
                 <!-- Filters -->
@@ -35,21 +47,30 @@
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Date de début
                         </label>
-                        <input type="date"
+                        <input type="date" id="date_from" name="date_from"
                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     </div>
                     <div>
                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Date de fin
                         </label>
-                        <input type="date"
+                        <input type="date" id="date_to" name="date_to"
                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
                     </div>
                     <div class="flex items-end">
-                        <button
-                            class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 focus:bg-brand-600 h-11 w-full rounded-lg px-4 py-2.5 text-sm font-medium text-white transition focus:outline-hidden">
-                            Générer le rapport
-                        </button>
+                        <form method="POST" action="{{ route('reports.sales.pdf') }}" class="w-full">
+                            @csrf
+                            <input type="hidden" id="export_date_from" name="date_from" value="">
+                            <input type="hidden" id="export_date_to" name="date_to" value="">
+                            <button type="submit"
+                                class="bg-brand-500 shadow-theme-xs hover:bg-brand-600 focus:bg-brand-600 h-11 w-full rounded-lg px-4 py-2.5 text-sm font-medium text-white transition focus:outline-hidden">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 10v6m0 0l4-4m-4 4l-4-4m8 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Exporter PDF
+                            </button>
+                        </form>
                     </div>
                 </div>
 
@@ -166,158 +187,158 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Configuration des couleurs pour le thème sombre
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#f9fafb' : '#374151';
-            const gridColor = isDark ? '#374151' : '#e5e7eb';
+                    // Configuration des couleurs pour le thème sombre
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const textColor = isDark ? '#f9fafb' : '#374151';
+                    const gridColor = isDark ? '#374151' : '#e5e7eb';
 
-            // Données réelles depuis le contrôleur Laravel
-            const salesData = {
-                labels: @json($salesData['labels']),
-                datasets: [{
-                    label: 'Ventes (' + @json(app_setting('currency_symbol', 'FC')) + ')',
-                    data: @json($salesData['data']),
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            };
+                    // Données réelles depuis le contrôleur Laravel
+                    const salesData = {
+                        labels: @json($salesData['labels']),
+                        datasets: [{
+                            label: 'Ventes (' + @json(app_setting('currency_symbol', 'FC')) + ')',
+                            data: @json($salesData['data']),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    };
 
-            const topProductsData = {
-                labels: @json($topProductsData['labels']),
-                datasets: [{
-                    data: @json($topProductsData['data']),
-                    backgroundColor: [
-                        '#3b82f6',
-                        '#10b981',
-                        '#f59e0b',
-                        '#ef4444',
-                        '#8b5cf6'
-                    ]
-                }]
-            };
+                    const topProductsData = {
+                        labels: @json($topProductsData['labels']),
+                        datasets: [{
+                            data: @json($topProductsData['data']),
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#10b981',
+                                '#f59e0b',
+                                '#ef4444',
+                                '#8b5cf6'
+                            ]
+                        }]
+                    };
 
-            const monthlyData = {
-                labels: @json($monthlyData['labels']),
-                datasets: [{
-                    label: 'Ventes',
-                    data: @json($monthlyData['data']),
-                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
-                    borderColor: '#10b981',
-                    borderWidth: 1
-                }]
-            };
+                    const monthlyData = {
+                        labels: @json($monthlyData['labels']),
+                        datasets: [{
+                            label: 'Ventes',
+                            data: @json($monthlyData['data']),
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: '#10b981',
+                            borderWidth: 1
+                        }]
+                    };
 
-            // Configuration commune
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: textColor
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: textColor
+                    // Configuration commune
+                    const commonOptions = {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: textColor
+                                }
+                            }
                         },
-                        grid: {
-                            color: gridColor
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: textColor
-                        },
-                        grid: {
-                            color: gridColor
-                        }
-                    }
-                }
-            };
-
-            // Graphique d'évolution des ventes
-            const salesCtx = document.getElementById('salesChart').getContext('2d');
-            new Chart(salesCtx, {
-                type: 'line',
-                data: salesData,
-                options: {
-                    ...commonOptions,
-                    plugins: {
-                        ...commonOptions.plugins,
-                        title: {
-                            display: true,
-                            text: 'Évolution mensuelle du chiffre d\'affaires',
-                            color: textColor
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(context
-                                        .parsed.y) + ' ' + @json(app_setting('currency_symbol', 'FC'));
+                        scales: {
+                            y: {
+                                ticks: {
+                                    color: textColor
+                                },
+                                grid: {
+                                    color: gridColor
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: textColor
+                                },
+                                grid: {
+                                    color: gridColor
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        ...commonOptions.scales,
-                        y: {
-                            ...commonOptions.scales.y,
-                            ticks: {
-                                ...commonOptions.scales.y.ticks,
-                                callback: function(value) {
-                                    return new Intl.NumberFormat('fr-FR', {
-                                        notation: 'compact',
-                                        compactDisplay: 'short'
-                                    }).format(value) + ' ' + @json(app_setting('currency_symbol', 'FC'));
+                    };
+
+                    // Graphique d'évolution des ventes
+                    const salesCtx = document.getElementById('salesChart').getContext('2d');
+                    new Chart(salesCtx, {
+                        type: 'line',
+                        data: salesData,
+                        options: {
+                            ...commonOptions,
+                            plugins: {
+                                ...commonOptions.plugins,
+                                title: {
+                                    display: true,
+                                    text: 'Évolution mensuelle du chiffre d\'affaires',
+                                    color: textColor
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Ventes: ' + new Intl.NumberFormat('fr-FR').format(context
+                                                .parsed.y) + ' ' + @json(app_setting('currency_symbol', 'FC'));
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                ...commonOptions.scales,
+                                y: {
+                                    ...commonOptions.scales.y,
+                                    ticks: {
+                                        ...commonOptions.scales.y.ticks,
+                                        callback: function(value) {
+                                            return new Intl.NumberFormat('fr-FR', {
+                                                notation: 'compact',
+                                                compactDisplay: 'short'
+                                            }).format(value) + ' ' + @json(app_setting('currency_symbol', 'FC'));
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            });
+                    });
 
-            // Graphique des top produits
-            const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
-            new Chart(topProductsCtx, {
-                type: 'doughnut',
-                data: topProductsData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: textColor,
-                                padding: 20
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed || 0;
-                                    return label + ': ' + new Intl.NumberFormat('fr-FR').format(value) +
-                                        ' unités';
+                    // Graphique des top produits
+                    const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+                    new Chart(topProductsCtx, {
+                        type: 'doughnut',
+                        data: topProductsData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: textColor,
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.parsed || 0;
+                                            return label + ': ' + new Intl.NumberFormat('fr-FR').format(value) +
+                                                ' unités';
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-            });
+                    });
 
-            // Graphique mensuel
-            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-            new Chart(monthlyCtx, {
-                type: 'bar',
-                data: monthlyData,
-                options: commonOptions
-            });
-        });
+                    // Synchroniser les valeurs pour l'export PDF
+                    document.getElementById('date_from').addEventListener('change', function() {
+                        document.getElementById('export_date_from').value = this.value;
+                    });
+
+                    document.getElementById('date_to').addEventListener('change', function() {
+                        document.getElementById('export_date_to').value = this.value;
+                    });
     </script>
 @endpush

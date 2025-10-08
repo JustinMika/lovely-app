@@ -89,7 +89,8 @@ Route::middleware(['auth'])->group(function () {
 
 	// Rapports - Admin/Gérant only
 	Route::prefix('reports')->name('reports.')->middleware(['role:Admin,Gérant'])->group(function () {
-		Route::get('/sales', [App\Http\Controllers\GlobalReportController::class, 'sales'])->name('sales');
+		Route::get('/sales', [App\Http\Controllers\SalesReportController::class, 'index'])->name('sales');
+		Route::post('/sales/pdf', [App\Http\Controllers\SalesReportController::class, 'exportPdf'])->name('sales.pdf');
 		Route::get('/financial', function () {
 			return view('pages.reports.financial');
 		})->name('financial');
