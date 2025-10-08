@@ -13,7 +13,7 @@
             </div>
             <div class="mt-4 flex items-end justify-between">
                 <div>
-                    <h4 class="text-title-md font-bold text-black dark:text-white">
+                    <h4 class="text-title-md font-bold text-black ">
                         {{ number_format($metrics['total_sales']) }}
                     </h4>
                     <span class="text-sm font-medium">Total des ventes</span>
@@ -190,7 +190,11 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // Attendre que Chart.js soit chargé
+        window.addEventListener('load', function() {
+            console.log('Dashboard script loaded');
+            console.log('Chart available:', typeof Chart !== 'undefined');
+            
             // Configuration pour le thème sombre
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#f9fafb' : '#374151';
@@ -201,8 +205,13 @@
             @endphp
 
             // Graphique de performance hebdomadaire
-            const ctx = document.getElementById('weeklyPerformanceChart');
-            if (ctx) {
+            const canvas = document.getElementById('weeklyPerformanceChart');
+            console.log('Canvas element found:', canvas !== null);
+            
+            if (canvas && typeof Chart !== 'undefined') {
+                console.log('Creating chart with data:', @json($chartData));
+                
+                const ctx = canvas.getContext('2d');
                 new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -341,6 +350,12 @@
                             }
                         }
                     }
+                });
+                console.log('Chart created successfully!');
+            } else {
+                console.error('Cannot create chart:', {
+                    canvasFound: canvas !== null,
+                    chartJsLoaded: typeof Chart !== 'undefined'
                 });
             }
         });
